@@ -1,0 +1,305 @@
+/* Degree Atlas · offline progress store · factual source-first academic data */
+(function(){
+'use strict';
+const U={
+ignou:'https://www.ignou.ac.in/schools/programme/MAANY',
+prospectus:'https://www.ignou.ac.in/viewFile/services/common_prospectus/common-prospectus-july-2026-V-L-1-1.pdf',
+guide:'https://www.egyankosh.ac.in/handle/123456789/124490',
+egy:'https://egyankosh.ac.in/handle/123456789/120506',
+assign:'https://www.ignou.ac.in/studentService/download/assignments',
+calendar:'https://www.ignou.ac.in/pages/51',
+announcements:'https://www.ignou.ac.in/announcements/0?nav=1',
+grade:'https://gradecard.ignou.ac.in/',
+exam:'https://exam.ignou.ac.in/',
+muj:'https://www.onlinemanipal.com/online-msc-mathematics-muj',
+mujpdf:'https://muj.onlinemanipal.com/wp-content/uploads/sites/2/2026/03/Final-PPR-for-M.Sc-Mathematics.pdf',
+mujdisclosure:'https://muj.onlinemanipal.com/self-disclosure',
+mujlogin:'https://login.muj.onlinemanipal.com/',
+alex:'https://kapil433.github.io/Alexandria/',
+alexrepo:'https://github.com/kapil433/Alexandria'
+};
+const MA=[
+['MAN-101','Introducing Anthropology',1,4,'Core','https://www.egyankosh.ac.in/bitstream/123456789/121874/1/Block-1.pdf','Emergence of anthropology; scientific debates; fieldwork and holistic perspectives'],
+['MAN-102','Physical/Biological Anthropology',1,4,'Core','https://egyankosh.ac.in/bitstream/123456789/121958/1/Unit-1.pdf','Human evolution, primates, variation and biological methods'],
+['MAN-103','Social and Cultural Anthropology',1,4,'Core','https://egyankosh.ac.in/handle/123456789/121889','Culture, kinship, theory and fieldwork'],
+['MAN-104','Archaeological Anthropology',1,4,'Core','https://egyankosh.ac.in/handle/123456789/121995','Dating methods, prehistory and material culture'],
+['MAN-105','Tribes in India',1,4,'Core','https://egyankosh.ac.in/handle/123456789/122085','Tribal histories, institutions, livelihoods, policy and rights'],
+['MAN-106','Applied Dimensions in Anthropology',2,4,'Core',null,'Applied and development anthropology; policy and professional practice'],
+['MAN-107','Environmental Anthropology',2,4,'Core','https://www.egyankosh.ac.in/handle/123456789/127859','Ecological approaches, resource governance and environmental justice'],
+['MAN-108','Research Methods in Anthropology-I',2,4,'Core','https://egyankosh.ac.in/handle/123456789/127853','Scientific research, data collection, qualitative methods and archaeological research'],
+['MAN-109','Research Methods in Anthropology-II',2,4,'Core',null,'Advanced analysis, reporting and mixed-method research'],
+['MAN-110','Epidemiology and Public Health',2,4,'Core',null,'Epidemiology, risk, communities and health systems'],
+['MANE-101','Human Genetics',3,4,'Group A',null,'Population genetics and inheritance'],
+['MANE-102','Human Growth and Development',3,4,'Group A',null,'Lifecourse and biosocial development'],
+['MANE-103','Physiological Anthropology',3,4,'Group A',null,'Human physiology and adaptations'],
+['MANE-104','Forensic Anthropology',3,4,'Group A',null,'Human skeletal analysis and identification'],
+['MANE-105','Ethnography',3,4,'Group B',null,'Ethnographic traditions and interpretation'],
+['MANE-106','Ethnographic Training',3,4,'Group B',null,'Fieldwork training and project'],
+['MANE-107','Urban Anthropology',3,4,'Group B',null,'Cities, migration, infrastructure and urban lives'],
+['MANE-108','Visual Anthropology',3,4,'Group B',null,'Visual methods, documentary, representation'],
+['MPA-033','Introduction to Disaster Management',3,4,'Interdisciplinary choice',null,'Disaster management'],
+['MED-008','Globalisation, Environment and Development',3,4,'Interdisciplinary choice',null,'Political economy, environment, globalisation'],
+['MWG-011','Women in the Economy',3,4,'Interdisciplinary choice',null,'Gender and economic systems'],
+['MANL-101','Practical in Physical/Biological Anthropology',4,8,'Required',null,'Practical work'],
+['MANP-101','Dissertation',4,8,'Required',null,'Independent research']
+];
+const MSc=[
+['DMM1101','Advanced Linear Algebra',1,4,'Core','Linear transformations; inner products; diagonalisation; spectral ideas'],
+['DMM1102','Mathematical Analysis',1,4,'Core','Sequences; limits; continuity; differentiation; convergence'],
+['DMM1103','Advanced Differential Equations',1,3,'Core','Analytical methods for ODE systems'],
+['DMM1104','Advanced Complex Analysis',1,4,'Core','Complex functions; analytic theory; integration'],
+['DMM1105','Topology-I',1,3,'Core','Metric spaces; topological spaces'],
+['DMM1106','Dynamics of a Rigid Body',1,3,'Core','Classical mechanics and rigid-body systems'],
+['DMM1201','Partial Differential Equation',2,4,'Core','Classification, boundary problems and solutions'],
+['DMM1202','Optimization Theory and Techniques',2,4,'Core','Constrained/unconstrained optimization'],
+['DMM1203','Functional Analysis',2,4,'Core','Normed spaces; operators; Banach and Hilbert spaces'],
+['DMM1204','Measure Theory & Integration',2,4,'Core','Sigma-algebras; measure; Lebesgue integration'],
+['DMM1205','Research Methodology & Technical Writing',2,4,'Core','Research design, writing and scientific communication'],
+['DMM1206','Seminar',2,2,'Core','Research presentation and communication'],
+['DMM2101','Fluid Dynamics',3,4,'Core','Continuity, flow, fluid motion and viscous dynamics'],
+['DMM2102','Special Functions',3,4,'Core','Special functions and analytical applications'],
+['DMM2103','Integral Equations and Calculus of Variations',3,4,'Core','Variational principles and integral equations'],
+['DMM2104','Theory of Field Extensions',3,4,'Core','Field theory, algebraic extensions'],
+['DMMEC1','Theory of Computation',3,3,'Computational Science elective','Automata, formal languages, computability'],
+['DMMEC2','Simulation and Modelling',3,3,'Computational Science elective','Simulation designs, validation and modelling'],
+['DMM2201','Project',4,10,'Required','Research project in approved pathway'],
+['DMMEC3','Quantum Computing',4,3,'Computational Science elective','Qubits, quantum algorithms and information'],
+['DMMEC4','Natural Language Processing (Deep Learning)',4,3,'Computational Science elective','Deep-learning based NLP methods']
+];
+const foundations=[
+['F01','Precalculus & Functions','Algebra, inequalities, logarithms, trigonometry, functions and graphs','https://openstax.org/details/books/precalculus-2e','OpenStax Precalculus','Preparation for all Semester 1 courses','Stage 1'],
+['F02','Logic, Sets & Proofs','Quantifiers, mathematical induction, contradiction and rigorous proof-writing','https://www.people.vcu.edu/~rhammack/BookOfProof/','Hammack · Book of Proof (free)','Required before real analysis, topology and abstract algebra','Stage 1'],
+['F03','Single-variable Calculus','Limits, differentiation, integration, sequences and series','https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/','MIT OCW 18.01SC','Mathematical Analysis, Differential Equations','Stage 1'],
+['F04','Linear Algebra','Vector spaces, bases, matrices, eigenvalues, inner products','https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/','MIT OCW 18.06SC','DMM1101 Advanced Linear Algebra','Stage 1'],
+['F05','Multivariable Calculus','Partial derivatives, multiple integrals, gradients, Jacobians','https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/','MIT OCW 18.02SC','PDEs, Fluid Dynamics, Optimization','Stage 2'],
+['F06','Ordinary Differential Equations','First- and second-order ODE, phase portraits and linear systems','https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/','MIT OCW 18.03SC','DMM1103 Advanced Differential Equations','Stage 2'],
+['F07','Real Analysis I','Completeness, epsilon-delta proofs, sequences, series and continuity','https://www.jirka.org/ra/','J. Lebl · Basic Analysis (free)','DMM1102 Mathematical Analysis, DMM1105 Topology-I','Stage 2'],
+['F08','Abstract Algebra','Groups, homomorphisms, quotient structures, rings and fields','https://open.umn.edu/opentextbooks/textbooks/abstract-algebra-theory-and-applications','Open Textbook Library · Abstract Algebra','DMM2104 Theory of Field Extensions','Stage 2'],
+['F09','Probability & Statistics','Random variables, distributions, expectation, inference','https://openstax.org/details/books/introductory-statistics-2e','OpenStax Introductory Statistics','Research design, quantitative social research','Stage 2'],
+['F10','Discrete Mathematics & Graphs','Combinatorics, relations, graphs, recurrence and network fundamentals','https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/','MIT OCW 6.042J','Theory of Computation and network science','Stage 3'],
+['F11','Numerical Computing & Python','Algorithms, approximation error, numerical linear algebra, simulation','https://numpy.org/learn/','NumPy learning resources','Simulation and Modelling; computational projects','Stage 3'],
+['F12','Analysis II & Metric Spaces','Uniform convergence, compactness, connectedness, introductory metric topology','https://www.jirka.org/ra/','J. Lebl · Basic Analysis (free)','Functional Analysis, Measure Theory, Topology-I','Stage 3']
+];
+const books=[
+['A01','Small Places, Large Issues','Thomas Hylland Eriksen','Anthropology · nonfiction','Ethnographic thinking and anthropological foundations',null],
+['A02','The Interpretation of Cultures','Clifford Geertz','Anthropology · nonfiction','Thick description and interpretation',null],
+['A03','Purity and Danger','Mary Douglas','Anthropology · nonfiction','Classification, ritual and social order',null],
+['A04','Seeing Like a State','James C. Scott','Anthropology · nonfiction','Legibility, planning and unintended outcomes',null],
+['A05','Research Methods in Anthropology','H. Russell Bernard','Anthropology · nonfiction','Fieldwork and mixed-methods research',null],
+['A06','The Nuer','E. E. Evans-Pritchard','Anthropology · nonfiction','Political organization and ethnography',null],
+['A07','The Dispossessed','Ursula K. Le Guin','Anthropology · fiction','Political economy, social institutions, alternative societies',null],
+['A08','The Left Hand of Darkness','Ursula K. Le Guin','Anthropology · fiction','Gender, kinship and culture',null],
+['A09','Things Fall Apart','Chinua Achebe','Anthropology · fiction','Colonial encounters and community change',null],
+['A10','The Hungry Tide','Amitav Ghosh','Anthropology · fiction','Ecology, displacement, conservation and livelihoods',null],
+['A11','The Overstory','Richard Powers','Anthropology · fiction','Ecological interdependence and environmental ethics',null],
+['M01','Calculus','Gilbert Strang','Mathematics · open textbook','Calculus foundations','https://ocw.mit.edu/courses/res-18-001-calculus-fall-2023/'],
+['M02','Book of Proof','Richard Hammack','Mathematics · open textbook','Logic and rigorous proof','https://www.people.vcu.edu/~rhammack/BookOfProof/'],
+['M03','Basic Analysis I & II','Jiří Lebl','Mathematics · open textbook','Rigorous analysis','https://www.jirka.org/ra/'],
+['M04','Linear Algebra','Jim Hefferon','Mathematics · open textbook','Undergraduate linear algebra','https://hefferon.net/linearalgebra/'],
+['M05','Introduction to Probability','Joseph K. Blitzstein, Jessica Hwang','Mathematics · nonfiction','Probabilistic modelling',null],
+['C01','Network Science','Albert-László Barabási','Complexity · open textbook','Networks, growth and robustness','https://networksciencebook.com/'],
+['C02','Complexity: A Guided Tour','Melanie Mitchell','Complexity · nonfiction','Emergence, computation and systems',null],
+['C03','Thinking in Systems','Donella H. Meadows','Complexity · nonfiction','Feedbacks and system structure',null],
+['C04','Scale','Geoffrey West','Complexity · nonfiction','Scaling laws in biology and cities',null],
+['C05','Micromotives and Macrobehavior','Thomas C. Schelling','Complexity · nonfiction','Micro-macro emergence',null],
+['C06','The Ministry for the Future','Kim Stanley Robinson','Complexity · fiction','Climate institutions, policy and collective action',null],
+['C07','Foundation','Isaac Asimov','Complexity · fiction','Modeling societal change and limits of prediction',null],
+['C08','The Three-Body Problem','Liu Cixin','Complexity · fiction','Interaction, uncertainty and civilization',null]
+];
+const research=[
+{key:'r1',title:'Social contagion of vehicle adoption',q:'How do trust and peer networks influence EV, CNG and hybrid adoption in Indian cities?',anth:'Semi-structured interviews; household decision ethnography; informed consent',math:'Network inference, hazard models, regressions and uncertainty intervals',complex:'Threshold diffusion and heterogeneous agent networks',data:'Aggregated registration series + consented survey and network ties',output:'Reproducible research note and pilot diffusion model'},
+{key:'r2',title:'Energy transitions as social-technical systems',q:'Why do infrastructure roll-outs produce unequal adoption despite similar prices and incentives?',anth:'Political ecology, stakeholder mapping and situated interviews',math:'Optimization, spatial statistics and mixed-effects models',complex:'Path dependence, feedbacks, co-evolution of infrastructure and demand',data:'Public infrastructure locations, policy histories, local fieldwork',output:'Comparative study with a documented causal diagram'},
+{key:'r3',title:'Resilience of mobility networks',q:'Which structures make urban mobility systems robust or fragile under disruption?',anth:'Document lived disruption, transport inequality and institutional response',math:'Graph theory, centrality, percolation, Monte Carlo simulation',complex:'Cascades and multilayer infrastructure networks',data:'Public roads/transport networks, disruptions and documented simulations',output:'Open reproducible notebook and network resilience paper draft'},
+{key:'r4',title:'Computational ethnography of urban transport',q:'Can ethnographic themes be combined with simulation without erasing lived context?',anth:'Fieldnotes, participant observation, reflexive coding',math:'Uncertainty quantification, statistical text analysis and validation',complex:'Agent-based models parameterized by qualitative and quantitative evidence',data:'Consented anonymized coded observations and open contextual data',output:'Ethics-first mixed methods protocol and prototype'}
+];
+const adminTasks=[
+['adm1','IGNOU admission confirmation & enrolment number','Anthropology'],
+['adm2','Verify MAANY programme and assigned study centre','Anthropology'],
+['adm3','Download applicable July 2026 assignments from official portal','Anthropology'],
+['adm4','Confirm assignment deadline and submission mode with study centre','Anthropology'],
+['adm5','Register/submit examination form and obtain hall ticket','Anthropology'],
+['adm6','Check IGNOU marks and grade card after evaluation','Anthropology'],
+['adm7','Review MUJ syllabus against actual LMS/course enrollment','Mathematics'],
+['adm8','Verify MUJ internal assessment and proctored TEE schedule in LMS','Mathematics'],
+['adm9','Review MUJ writing tablet requirement for assessments','Mathematics'],
+['adm10','Confirm MUJ elective selection and project-track approval','Mathematics']
+];
+const nav=[['anth','Anthropology','◈'],['math','Mathematics','∑'],['complex','Complexity','◎'],['library','Alexandria','▤']];
+let S={};
+try{S=JSON.parse(localStorage.getItem('degree-atlas-v2')||'{}');if(!S||typeof S!=='object'||Array.isArray(S))S={}}catch(e){S={}}
+if(!S.migrated){
+try{const legacy=JSON.parse(localStorage.getItem('degree-ignou-v1')||'{}');if(legacy&&typeof legacy==='object'){MA.forEach(c=>{if(legacy['course-'+c[0]]&&!S['done-'+c[0]])S['done-'+c[0]]=true;if(legacy['status-'+c[0]])S['a-status-'+c[0]]=legacy['status-'+c[0]];if(legacy['due-'+c[0]])S['a-due-'+c[0]]=legacy['due-'+c[0]];if(legacy['proof-'+c[0]])S['a-proof-'+c[0]]=legacy['proof-'+c[0]]});if(legacy.researchNotes)S.researchNotes=legacy.researchNotes;if(legacy.admission)S.admission=legacy.admission;if(legacy.centre)S.centre=legacy.centre;if(legacy.programme)S.programme=legacy.programme;if(legacy.hours)S.legacyHours=Number(legacy.hours)||0}}catch(e){}
+S.migrated=true;store()}
+function store(){try{localStorage.setItem('degree-atlas-v2',JSON.stringify(S))}catch(e){console.warn('Could not save locally',e)}}
+function html(s){return String(s===undefined||s===null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function att(s){return html(s)}
+function safeURL(s){try{const u=new URL(String(s));return /^https?:$/.test(u.protocol)?u.href:''}catch(e){return''}}
+function L(url,label,cls){return '<a class="'+(cls||'')+'" href="'+att(safeURL(url))+'" target="_blank" rel="noopener noreferrer">'+html(label)+' ↗</a>'}
+function chip(url,title){return L(url,title,'resource-chip')}
+function donePct(prefix,items){if(!items.length)return 0;return Math.round(items.filter(x=>S[prefix+x[0]]).length/items.length*100)}
+function countDone(prefix,items){return items.filter(x=>!!S[prefix+x[0]]).length}
+function progress(p){return '<div class="progress"><b style="width:'+Math.min(100,Math.max(0,p))+'%"></b></div>'}
+function sec(text,meta){return '<div class="section-title">'+html(text)+(meta?'<small>'+html(meta)+'</small>':'')+'</div>'}
+function notice(title,body,cls){return '<div class="notice '+(cls||'')+'"><strong>'+html(title)+'</strong> '+body+'</div>'}
+function card(inner,cls){return '<article class="card '+(cls||'')+'">'+inner+'</article>'}
+function pill(t,style){return '<span class="pill '+(style||'')+'">'+html(t)+'</span>'}
+function cls(n){return n==='Done'||n==='Submitted'||n==='Evaluated'?'green':n==='Planned'||n==='Drafting'?'purple':' '}
+function shell(inner){document.getElementById('view').innerHTML=inner+foot()}
+function foot(){return '<footer class="footer"><span>Degree Atlas · Independent learning companion · Stored in this browser</span><span>Sources checked 11 November 2026 · Not an official university portal</span></footer>'}
+function setTitle(title){document.getElementById('current-section').textContent=title;document.title=title+' · Degree Atlas'}
+function dateStatus(dt){if(!dt)return 'Date not entered';const date=new Date(dt+'T23:59:59');if(Number.isNaN(date.getTime()))return 'Invalid date';const days=Math.floor((date-new Date())/86400000);return days<0?'Overdue by '+Math.abs(days)+'d':days===0?'Due today':'In '+(days+1)+'d'}
+function thisWeekMinutes(){const now=new Date(),ago=new Date(now.getTime()-7*86400000);return (S.sessions||[]).reduce((n,x)=>{const d=new Date(x.date+'T12:00:00');return d>=ago&&d<=now?n+Number(x.minutes||0):n},0)}
+function metrics(title,num,desc,percent){return card('<div class="metric-label">'+html(title)+'</div><div class="metric-number mono">'+html(num)+'</div>'+ (percent!==undefined?progress(percent):'')+'<div class="metric-foot">'+html(desc)+'</div>')}
+function filters(sub,id,options){return '<div class="seg" role="group" aria-label="'+html(sub)+'">'+options.map(x=>'<button class="'+(id===x[0]?'active':'')+'" onclick="Degree.sub(\\''+x[0]+'\\')">'+html(x[1])+'</button>').join('')+'</div>'}
+function drawNav(){document.getElementById('side-nav').innerHTML=nav.map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\\''+n[0]+'\\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('mobile-nav').innerHTML=nav.map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\\''+n[0]+'\\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('nightbtn').textContent=document.body.classList.contains('night')?'☀':'☾'}
+let page='anth',sub='overview',mathSub='foundations',complexSub='research',search='';
+const intros={
+anth:['THE HUMAN SCIENCES','Anthropology','Culture, evolution, environment and the everyday lives of people.','IGNOU · MAANY · July 2026 application'],
+math:['FROM FIRST PRINCIPLES','Mathematics','Rebuild undergraduate foundations; then climb to MUJ MSc mathematics with confidence.','MUJ · MSc Mathematics · 81 credits'],
+complex:['THE INTERDISCIPLINARY LAB','Complexity Science','A research programme connecting ethnography, equations, networks and social-technical change.','Research · Networks · Simulation'],
+library:['YOUR PERSONAL KNOWLEDGE ATLAS','Alexandria','A doorway into your larger library of fiction, nonfiction, ideas and intellectual connections.','Literature · Notes · Synthesis']
+};
+function hero(key,cta,label,secondary,secondaryLabel){const d=intros[key];return '<div class="hero"><div class="eyebrow">'+html(d[0])+'</div><h1>'+html(d[1])+'</h1><p>'+html(d[2])+'</p>'+(cta?L(cta,label,'lightbutton'):'')+(secondary?L(secondary,secondaryLabel,'ghostbutton'):'')+'<div style="margin-top:20px;font-size:.73rem;color:#b8c4e2">'+html(d[3])+'</div></div>'}
+function goto(h){if(location.hash!=='#'+h)location.hash=h;else route()}
+function route(){let h=(location.hash||'#anth').replace('#','');if(!nav.some(x=>x[0]===h))h='anth';page=h;sub='overview';search='';render();window.scrollTo({top:0,behavior:'instant'})}
+function render(){drawNav();setTitle(nav.find(x=>x[0]===page)[1]);if(page==='anth')renderAnth();else if(page==='math')renderMath();else if(page==='complex')renderComplex();else renderLibrary()}
+function buttonSub(id,label){return '<button onclick="Degree.sub(\\''+id+'\\')" class="'+(sub===id?'active':'')+'">'+html(label)+'</button>'}
+function viewTabs(options){return '<div class="toolbar"><div class="seg">'+options.map(x=>buttonSub(x[0],x[1])).join('')+'</div></div>'}
+function authResource(){return '<div>'+chip(U.prospectus,'July 2026 prospectus')+chip(U.guide,'MAANY programme guide')+chip(U.egy,'eGyanKosh MAANY')+chip(U.assign,'Official assignments')+chip(U.calendar,'IGNOU calendar')+'</div>'}
+function renderAnth(){
+let head=hero('anth',U.ignou,'Official programme',U.egy,'Study materials')+viewTabs([['overview','Overview'],['courses','Courses'],['assignments','Assignments'],['reading','Reading'],['admin','Admin']]);
+if(sub==='overview'){
+const anthCore=MA.slice(0,10),p=donePct('done-',anthCore),submitted=anthCore.filter(x=>['Submitted','Evaluated'].includes(S['a-status-'+x[0]])).length;
+head+=notice('July 2026 cohort · status must be checked','The official MAANY curriculum has 80 credits across four semesters. Application ≠ admission confirmation. First-year assignment PDFs must match your applicable session.','amber');
+head+='<div class="grid four">'+metrics('Core courses marked complete',countDone('done-',anthCore)+' / 10','Personal course checklist',p)+metrics('Assignments submitted',submitted+' / 10','Requires actual acknowledgement',Math.round(submitted/10*100))+metrics('Semester structure','4','20 credits each')+metrics('Programme total','80','Credits prescribed by IGNOU')+'</div>';
+head+=sec('Start here','Verified university sources')+card(authResource()+'<p class="small muted">For source documents, follow only university-hosted links. Individual eGyanKosh course collections are linked in the course library when verified.</p>');
+head+=sec('Your next actions','Track each step honestly')+card(adminTasks.slice(0,6).map(t=>checkTask(t)).join(''));
+head+=sec('Academic timeline','Official general calendar, not personalised deadlines')+'<div class="grid two">'+card('<h3>July cohort · semester system</h3><p>IGNOU’s general calendar lists assignment submission activity during August–September and December term-end examinations. Session notices and centre instructions can change this schedule.</p>'+L(U.calendar,'View official calendar','linktext'))+card('<h3>Assignment workflow</h3><p>Download matching PDF → draft → review → confirm submission mode → submit → retain proof → check grade card.</p>'+L(U.assign,'Find applicable assignment PDFs','linktext'))+'</div>';
+}else if(sub==='courses'){
+head+=notice('Curriculum versus content','Official course codes, titles, groups and credits follow the July 2026 prospectus. Individual topic blurbs are study orientation only. Verified eGyanKosh links are marked “Study material”; other courses link to the programme repository.');
+head+='<div class="toolbar"><input class="control search" id="anthSearch" placeholder="Search courses or codes…" value="'+att(search)+'" oninput="Degree.filter(this.value)"><select class="control" onchange="Degree.filterSem(this.value)"><option value="0">All semesters</option>'+[1,2,3,4].map(n=>'<option value="'+n+'" '+((S.anthSem||0)==n?'selected':'')+'>Semester '+n+'</option>').join('')+'</select></div>';
+const sem=Number(S.anthSem||0),matches=MA.filter(c=>(!sem||c[2]===sem)&&(c[0]+' '+c[1]+' '+c[6]).toLowerCase().includes(search.toLowerCase()));
+head+='<div class="grid two">'+matches.map(c=>renderAnthCourse(c)).join('')+'</div>';
+if(!matches.length)head+='<div class="empty">No matching courses. Clear the filter to see all courses.</div>';
+head+=notice('Third- and fourth-semester course selection','Semester 3 requires two Group A + two Group B courses + one interdisciplinary course. Semester 4 includes an 8-credit practical, 8-credit dissertation, plus one approved 4-credit interdisciplinary elective.');
+}else if(sub==='assignments'){
+head+=notice('Deadline verification','No automatically generated deadline is authoritative. In the official portal search each course code and check “Valid for Session”, the PDF instructions and your study centre’s current method. Earlier January 2026-only PDFs should not be treated as valid for July 2026.','amber');
+head+=card('<h3>Official submission resources</h3>'+chip(U.assign,'Current assignment search')+chip(U.announcements,'Announcements and extensions')+chip(U.grade,'Grade card')+'<p class="small muted">After submitting, record the real acknowledgement, not simply “draft complete”.</p>');
+head+=sec('Assignment workbench','10 first-year courses; deadlines are your verified entries');
+head+='<div class="stack">'+MA.filter(c=>c[2]<=2).map(c=>assignmentCard(c)).join('')+'</div>';
+}else if(sub==='reading'){
+head+=notice('Legitimate book links','Free texts open their official host. Copyrighted books link to catalogue search, not unauthorized downloads.');
+head+=bookShelf('Anthropology · nonfiction')+bookShelf('Anthropology · fiction');
+}else if(sub==='admin'){
+head+=notice('Administrative information','Admission status is editable; this dashboard cannot read your private IGNOU student record or track live university notifications.');
+head+='<div class="grid two">'+card('<h3>IGNOU student profile</h3><div class="formgrid"><label class="field">Admission status<select data-key="admission" onchange="Degree.saveInput(this)">'+['Applied; awaiting confirmation','Confirmed','Enrolment received'].map(v=>'<option '+(S.admission===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label><label class="field">Enrolment / programme code<input data-key="programme" placeholder="e.g. MAANY" value="'+att(S.programme||'')+'" onchange="Degree.saveInput(this)"></label><label class="field">Regional / learner support centre<input data-key="centre" value="'+att(S.centre||'')+'" placeholder="Enter confirmed centre" onchange="Degree.saveInput(this)"></label><label class="field">Personal next check date<input type="date" data-key="admissionCheck" value="'+att(S.admissionCheck||'')+'" onchange="Degree.saveInput(this)"></label></div></div>')+card('<h3>Administrative checklist</h3>'+adminTasks.slice(0,6).map(t=>checkTask(t)).join(''))+'</div>';
+head+=sec('Official academic support')+card(chip(U.ignou,'Programme information')+chip(U.assign,'Assignment portal')+chip(U.calendar,'Calendar')+chip(U.exam,'Exam portal')+chip(U.grade,'Grade card')+chip('https://www.ignou.ac.in/schools','School and faculty directory')+'<p class="small muted">Faculty supervision and contact availability should be verified on the current IGNOU department pages.</p>');
+}shell(head);
+}
+function checkTask(t){return '<label class="checkline" style="padding:8px 0;font-size:.85rem"><input type="checkbox" '+(S['task-'+t[0]]?'checked':'')+' onchange="Degree.set(\\'task-'+t[0]+'\\',this.checked)"><span>'+html(t[1])+'</span></label>'}
+function renderAnthCourse(c){
+const verified=!!c[5];
+return card('<div class="course"><div><div class="course-top">'+pill('Semester '+c[2],'purple')+pill(c[4])+pill(c[3]+' credits')+'</div><div class="course-name">'+html(c[0]+' · '+c[1])+'</div><p class="course-desc">'+html(c[6])+'</p></div><label title="Personal completion only"><input aria-label="Mark course completed" class="course-check" type="checkbox" '+(S['done-'+c[0]]?'checked':'')+' onchange="Degree.set(\\'done-'+c[0]+'\\',this.checked)"></label></div><div class="source-links">'+L(verified?c[5]:U.egy,verified?'Study material':'MAANY repository')+L(U.prospectus,'Official syllabus')+(c[2]<=2?'<button class="pbutton" onclick="Degree.sub(\\'assignments\\')">Assignment tracker →</button>':'')+'</div>');
+}
+function assignmentCard(c){
+const id=c[0],status=S['a-status-'+id]||'Not started',date=S['a-due-'+id]||'',url=S['a-url-'+id]||'',proof=S['a-proof-'+id]||'';
+return card('<div class="row-between"><div><div class="course-top">'+pill(id,'purple')+pill('Sem '+c[2])+'</div><h3>'+html(c[1])+'</h3></div>'+pill(status,cls(status))+'</div><div class="formgrid" style="margin-top:13px"><label class="field">Work / submission stage<select data-key="a-status-'+id+'" onchange="Degree.saveInput(this)">'+['Not started','Reading','Drafting','Reviewing','Ready','Submitted','Evaluated'].map(s=>'<option '+(status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label><label class="field">Verified due date (enter manually)<input type="date" value="'+att(date)+'" data-key="a-due-'+id+'" onchange="Degree.saveInput(this)"></label><label class="field">Applicable official assignment PDF URL<input value="'+att(url)+'" placeholder="Paste verified PDF URL" data-key="a-url-'+id+'" onchange="Degree.saveInput(this)"></label><label class="field">Submission acknowledgement / mark<input value="'+att(proof)+'" data-key="a-proof-'+id+'" placeholder="Receipt / marks / notes" onchange="Degree.saveInput(this)"></label></div><div class="source-links">'+L(U.assign,'Find '+id+' assignment')+(safeURL(url)?L(url,'Your verified PDF'):'')+L(U.grade,'Check grade card')+'</div>'+(date?'<p class="small muted">'+html(dateStatus(date))+' · user-entered date</p>':''));
+}
+function bookShelf(category){const arr=books.filter(b=>b[3]===category);return sec(category,arr.length+' reading picks')+card('<div class="book-list">'+arr.map(b=>bookRow(b)).join('')+'</div>')}
+function bookRow(b){const catalogue='https://openlibrary.org/search?q='+encodeURIComponent(b[1]+' '+b[2]),url=b[5]||catalogue,status=S['book-'+b[0]]||'To read';return '<div class="bookrow"><div><h4>'+html(b[1])+'</h4><p>'+html(b[2]+' · '+b[4])+'</p><div class="tagrow">'+pill(b[5]?'Open educational resource':'Catalogue lookup',b[5]?'green':'')+'</div></div><div><select class="control small" aria-label="Reading status '+att(b[1])+'" onchange="Degree.set(\\'book-'+b[0]+'\\',this.value)">'+['To read','Reading','Finished'].map(s=>'<option '+(status===s?'selected':'')+'>'+s+'</option>').join('')+'</select><div style="margin-top:6px">'+L(url,b[5]?'Read free':'Find book','linktext')+'</div></div></div>'}
+function renderMath(){
+let head=hero('math',U.mujpdf,'Official detailed syllabus',U.muj,'MUJ programme')+viewTabs([['foundations','Undergraduate foundations'],['msc','MUJ MSc'],['planner','Planner & deadlines'],['reading','Books & resources']]);
+if(sub==='foundations'){
+let n=countDone('found-',foundations),p=donePct('found-',foundations);
+head+=notice('Essential distinction','This undergraduate bridge is an independently designed preparatory track, NOT MUJ coursework and not counted toward its 81 credits.');
+head+='<div class="grid two">'+metrics('Bridge modules complete',n+' / 12','Personal preparation milestones',p)+metrics('Study pathway','3 stages','Arithmetic/analysis → algebra → computation')+'</div>';
+head+=sec('Preparation pathway','Follow the sequence, or test out of what you already know');
+head+='<div class="grid two">'+foundations.map(f=>card('<div class="row-between">'+pill(f[6],'purple')+'<input aria-label="Mark '+att(f[1])+' complete" class="course-check" type="checkbox" '+(S['found-'+f[0]]?'checked':'')+' onchange="Degree.set(\\'found-'+f[0]+'\\',this.checked)"></div><h3>'+html(f[1])+'</h3><p>'+html(f[2])+'</p><div class="small muted"><strong>Feeds into:</strong> '+html(f[5])+'</div><div class="source-links">'+L(f[3],f[4])+'</div>')).join('')+'</div>';
+head+=sec('How to study each module')+card('<div class="timeline">'+[['1','Understand','Work through a full lecture or chapter and define key objects'],['2','Prove','Complete at least five exercises without checking solutions first'],['3','Apply','Write Python or visual examples where useful'],['4','Assess','Produce one-page notes; revisit after 1, 7 and 30 days']].map(x=>'<div class="timeline-item"><span class="stepbadge">'+x[0]+'</span><div><h4>'+x[1]+'</h4><p>'+x[2]+'</p></div></div>').join('')+'</div>');
+}else if(sub==='msc'){
+head+=notice('MUJ curricular evidence','Course codes, titles and credits below follow the MUJ official March 2026 programme document. Computational Science is shown as a suggested elective pathway; confirm your actual elective registration with MUJ. The six core Semester 1 courses total 21 credits.');
+head+='<div class="grid four">'+[[1,21],[2,22],[3,22],[4,16]].map(x=>metrics('Semester '+x[0],x[1]+' cr','Official credit allocation')).join('')+'</div>';
+head+=sec('Official curriculum','Credit-bearing university courses');
+for(let sem=1;sem<=4;sem++){let items=MSc.filter(c=>c[2]===sem);head+='<div class="row-between">'+sec('Semester '+sem,items.length+' subjects including planned Computational Science electives')+'</div><div class="grid two">'+items.map(c=>renderMScCourse(c)).join('')+'</div>'}
+head+=sec('Other official elective baskets')+card('<div class="grid two"><div><h3>Semester 3</h3><p>Mathematics: Fuzzy Sets & Their Applications; Mechanics of Solids.</p><p>Data Science: Fundamentals of Data Science; Machine Learning.</p><p>Econometrics: Mathematics for Economists; Econometrics Applications.</p></div><div><h3>Semester 4</h3><p>Mathematics: Mathematical Statistics; Linear Models.</p><p>Data Science: Data Visualization; Business Analytics.</p><p>Econometrics: Econometric Methods; Bayesian Econometrics.</p></div></div>'+L(U.mujpdf,'Full MUJ syllabus PDF','linktext'));
+}else if(sub==='planner'){
+head+=notice('MUJ dates: student-specific','The official programme describes online-proctored term-end examinations and LMS-based assessments. Specific assessment deadlines, slots and examination dates are to be confirmed in your MUJ LMS/admit card. They are not invented here.','amber');
+head+='<div class="grid two">'+card('<h3>Verified MUJ assessment facts</h3><div class="timeline">'+[['01','Continuous assessment','Official published programme FAQ states at least 40% in continuous assessment'],['02','Term-end examinations','Online-proctored; at least 40% in term-end exams'],['03','Tablet requirement','An approved graphic tablet is required for mathematical assignments/exams'],['04','Project','University lists guide-based and Coursera-based project paths, subject to approval']].map(x=>'<div class="timeline-item"><span class="stepbadge">'+x[0]+'</span><div><h4>'+x[1]+'</h4><p>'+x[2]+'</p></div></div>').join('')+'</div>'+L(U.muj,'Official FAQs','linktext'))+card('<h3>MUJ administrative checklist</h3>'+adminTasks.slice(6).map(t=>checkTask(t)).join('')+'<div class="divider"></div>'+chip(U.mujpdf,'Syllabus PDF')+chip(U.mujdisclosure,'University disclosure')+chip(U.mujlogin,'Application portal')+'</div>')+'</div>';
+head+=sec('Personal deadlines','Dates you enter from LMS / official notices');
+head+=taskManager('Mathematics');
+}else if(sub==='reading'){
+head+=notice('Math reading guide','Begin with undergraduate resources. The official MUJ PPR document also specifies course-wise textbook references in the detailed syllabus.');
+head+=bookShelf('Mathematics · open textbook')+bookShelf('Mathematics · nonfiction');
+head+=sec('Free structured courses')+card(chip('https://ocw.mit.edu/collections/ocw-scholar/','MIT OCW Scholar')+chip('https://openstax.org/subjects/math','OpenStax mathematics')+chip('https://math.libretexts.org/','LibreTexts Mathematics')+chip('https://www.jirka.org/ra/','Basic Analysis')+chip(U.mujpdf,'MUJ official textbook references'));
+}shell(head);
+}
+function renderMScCourse(c){const planned=c[4]==='Computational Science elective';return card('<div class="course"><div><div class="course-top">'+pill(c[0],'purple')+pill(c[3]+' credits')+(planned?pill('Elective path · unconfirmed','amber'):pill(c[4]))+'</div><div class="course-name">'+html(c[1])+'</div><p class="course-desc">'+html(c[5])+'</p></div><label><input type="checkbox" class="course-check" aria-label="Mark '+att(c[1])+' complete" '+(S['msc-'+c[0]]?'checked':'')+' onchange="Degree.set(\\'msc-'+c[0]+'\\',this.checked)"></label></div><div class="source-links">'+L(U.mujpdf,'Official detailed syllabus')+L(U.muj,'Programme overview')+'</div>')}
+function taskManager(domain){const tasks=(S.customTasks||[]).filter(t=>t.domain===domain);return card('<h3>Add an academic milestone</h3><div class="formgrid"><label class="field">Task<input id="newTask" placeholder="e.g. DMM1101 assignment 1"></label><label class="field">Date (personal / verified)<input type="date" id="newDate"></label><label class="field">Source classification<select id="newKind"><option value="Personal target">Personal target</option><option value="Officially verified by me">Officially verified by me</option></select></label><label class="field">Source URL (optional)<input id="newSource" placeholder="https://official university source"></label></div><div class="actions-row"><button class="btn primary" onclick="Degree.addTask(\\''+domain+'\\')">＋ Add milestone</button></div><div class="divider"></div>'+(tasks.length?tasks.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))).map(t=>'<div class="task"><div><div class="task-title">'+html(t.title)+'</div><div class="meta">'+html(t.date||'No date')+' · '+html(dateStatus(t.date))+' · '+html(t.kind||'Personal target')+'</div>'+ (safeURL(t.source)?L(t.source,'Source','linktext'):'')+'</div><div class="controls"><label class="checkline small"><input type="checkbox" '+(t.done?'checked':'')+' onchange="Degree.taskToggle(\\''+t.id+'\\',this.checked)"> Done</label><button class="btn" onclick="Degree.taskDelete(\\''+t.id+'\\')">Remove</button></div></div>').join(''):'<div class="empty">No milestones added yet. Enter verified LMS dates and personal targets above.</div>')+'</div>')}
+function renderComplex(){
+let head=hero('complex','https://www.complexityexplorer.org/','Explore free courses','https://networksciencebook.com/','Network Science textbook')+viewTabs([['research','Projects'],['path','Methods roadmap'],['reading','Books & ideas'],['routine','Weekly routine']]);
+if(sub==='research'){
+head+=notice('Research-first design','Projects below are original proposals, not advertised university research positions. Empirical claims require evidence; ethics and consent are prerequisites for primary fieldwork.');
+head+=sec('The cross-disciplinary research lab','Anthropology × mathematics × complexity');
+head+='<div class="node-map"><svg viewBox="0 0 760 270" role="img" aria-label="Three connected academic disciplines converge on original research"><defs><linearGradient id="g" x1="0" x2="1"><stop stop-color="#7a76ef"/><stop offset="1" stop-color="#43b9c0"/></linearGradient></defs><g stroke="#839bc0" stroke-width="2" opacity=".6"><path d="M144 73 L385 147 L614 74 M144 73 L145 218 L385 147 L615 218 L614 74 M145 218 L614 74" fill="none"/></g><g><circle cx="145" cy="72" r="49" fill="#415d8b"/><circle cx="615" cy="72" r="49" fill="#4a5d8a"/><circle cx="145" cy="215" r="49" fill="#3b737d"/><circle cx="615" cy="215" r="49" fill="#385e80"/><circle cx="383" cy="147" r="63" fill="url(#g)"/></g><g text-anchor="middle"><text x="145" y="67" font-size="13">Anthro-</text><text x="145" y="84" font-size="13">pology</text><text x="615" y="77" font-size="14">Maths</text><text x="145" y="220" font-size="14">Networks</text><text x="615" y="220" font-size="14">Simulation</text><text x="383" y="141" font-size="15" fill="#fff">Original</text><text x="383" y="161" font-size="15" fill="#fff">Research</text></g></svg></div>';
+head+=sec('Research questions worth pursuing','Choose a topic, then build evidence')+'<div class="grid two">'+research.map(r=>card('<div class="row-between">'+pill('Research proposal','purple')+'<input type="checkbox" aria-label="Mark '+att(r.title)+' research milestone" class="course-check" '+(S['project-'+r.key]?'checked':'')+' onchange="Degree.set(\\'project-'+r.key+'\\',this.checked)"></div><h3>'+html(r.title)+'</h3><p><strong>Question:</strong> '+html(r.q)+'</p><div class="course-detail"><p><b>Anthropology:</b> '+html(r.anth)+'</p><p><b>Mathematics:</b> '+html(r.math)+'</p><p><b>Complexity:</b> '+html(r.complex)+'</p><p><b>Evidence:</b> '+html(r.data)+'</p></div><p><b>Potential output:</b> '+html(r.output)+'</p>','research-card')).join('')+'</div>';
+head+=sec('Research notebook','Stored locally');
+head+=card('<label class="field">Research questions, faculty outreach, paper outlines<textarea id="researchNotes" onchange="Degree.set(\\'researchNotes\\',this.value)" placeholder="Notes, citations, ethical considerations…">'+html(S.researchNotes||'')+'</textarea></label><p class="footnote">Export your data frequently. This site does not send notes to a cloud database.</p>');
+}else if(sub==='path'){
+const steps=[['01','Mathematical foundations','Calculus, proofs, linear algebra, probability and differential equations','Undergraduate math'],['02','Core anthropology','Culture, kinship, ethnography, political ecology, fieldwork ethics','IGNOU MAN-101 to MAN-110'],['03','Network science','Graphs, centrality, random networks, diffusion, robustness','Barabási Network Science'],['04','Systems and simulation','Feedback, ODEs, state space, Monte Carlo and agent-based models','MUJ DMMEC2; Complexity Explorer'],['05','Pilot mixed-methods study','Ethnographic interviews + network data + quantitative model','Consent, measurement, preregistration'],['06','Research communication','Reproducible repo, literature review, manuscript and conference abstract','Avoid predatory journals; get supervisor feedback']];
+head+=sec('A coherent research sequence','A 12–24 month independent plan, not university deadlines');
+head+=card('<div class="timeline">'+steps.map(s=>'<div class="timeline-item"><span class="stepbadge">'+s[0]+'</span><div><h4>'+s[1]+'</h4><p>'+s[2]+'</p><span class="tiny-badge">'+s[3]+'</span></div></div>').join('')+'</div>');
+head+=sec('Research methods shelf')+card(chip('https://networksciencebook.com/','Free Network Science textbook')+chip('https://www.complexityexplorer.org/','Complexity Explorer')+chip('https://www.santafe.edu/','Santa Fe Institute')+chip('https://www.complexityexplorer.org/courses','Open courses')+chip('https://www.openalex.org/','OpenAlex research')+chip('https://www.crossref.org/','Crossref DOI metadata')+'<p class="small muted">Institutional pages are discovery resources, not promises of open internships or supervisor availability.</p>');
+}else if(sub==='reading'){
+head+=bookShelf('Complexity · open textbook')+bookShelf('Complexity · nonfiction')+bookShelf('Complexity · fiction');
+}else if(sub==='routine'){
+head+=notice('Adaptive by manual tracking','Log actual study sessions; completed tasks and hours stay in this browser. A repeated schedule is suggested, not an official university timetable.');
+head+=routineUI();
+}shell(head);
+}
+function routineUI(){
+const week=[['Mon','Mathematics foundations',60],['Tue','IGNOU core reading',50],['Wed','Mathematics exercises',70],['Thu','Ethnography / nonfiction',45],['Fri','Research literature / coding',90],['Sat','MUJ coursework and practice',150],['Sun','Assignments, revision and planning',120]];
+const minutes=thisWeekMinutes(),target=Number(S.weekTarget||12),pct=target?Math.round(minutes/(target*60)*100):0;
+return '<div class="grid two">'+metrics('Last 7 days',Math.round(minutes/60*10)/10+' h','Rolling logged hours against '+target+'h target',pct)+card('<h3>Log a study session</h3><div class="formgrid"><label class="field">Domain<select id="logDomain"><option>Mathematics</option><option>Anthropology</option><option>Complexity</option></select></label><label class="field">Minutes<input id="logMinutes" type="number" min="5" max="600" step="5" value="45"></label><label class="field">Weekly target hours<input data-key="weekTarget" type="number" min="1" max="70" value="'+att(S.weekTarget||12)+'" onchange="Degree.saveInput(this)"></label></div><div class="actions-row"><button class="btn primary" onclick="Degree.logStudy()">Log time</button></div></div></div>'+sec('Suggested weekly timetable','9h 45m core baseline, plus optional focused sessions')+card(week.map((w,i)=>'<div class="row-between" style="padding:9px 0;border-bottom:1px solid var(--line)"><label class="checkline" style="font-size:.83rem"><input type="checkbox" '+(S['weekly-'+i]?'checked':'')+' onchange="Degree.set(\\'weekly-'+i+'\\',this.checked)"><span><b>'+w[0]+'</b> · '+html(w[1])+'</span></label><span class="small muted mono">'+w[2]+' min</span></div>').join('')+'<div class="actions-row"><button class="btn" onclick="Degree.resetWeek()">Reset checkmarks</button></div>')+sec('Recent study log')+card((S.sessions||[]).length?(S.sessions||[]).slice(-8).reverse().map(x=>'<div class="task"><span class="small">'+html(x.date)+' · '+html(x.domain)+'</span><b class="mono small">'+html(x.minutes)+' min</b></div>').join(''):'<div class="empty">No study sessions logged yet.</div>');
+}
+function renderLibrary(){
+let head=hero('library',U.alex,'Open Alexandria',U.alexrepo,'View library on GitHub');
+head+=notice('External library project','The Alexandria tab points to your separate library repository. Reading progress inside this Degree site stays local to this domain and is not automatically synchronized with Alexandria.');
+head+=card('<div class="eyebrow">YOUR LONG-FORM KNOWLEDGE SYSTEM</div><h3 style="font-size:1.4rem">Alexandria — A Literary & Intellectual Atlas</h3><p>Use Alexandria to explore and connect books, essays and ideas beyond your degree curricula. Fiction can enrich anthropological imagination; nonfiction can supply frameworks for mathematical and systems reasoning.</p><div class="actions-row">'+L(U.alex,'Launch Alexandria','btn primary')+L(U.alexrepo,'Source repository','btn')+'</div>');
+head+=sec('Reading bridges','A book can connect all three disciplines');
+head+='<div class="grid three">'+card('<h3>Society and culture</h3><p>Literary ethnography, ritual, institutions, kinship, migration and contested identities.</p>'+L('https://openlibrary.org/search?q=The+Dispossessed+Le+Guin','The Dispossessed','linktext'))+card('<h3>Scientific models</h3><p>Proofs, numerical reasoning, uncertainty, inference and modelling.</p>'+L('https://hefferon.net/linearalgebra/','Linear Algebra (free)','linktext'))+card('<h3>Emergence and systems</h3><p>Feedback loops, network effects, path dependence and collective patterns.</p>'+L('https://networksciencebook.com/','Network Science (free)','linktext'))+'</div>';
+head+=sec('Reading tracker','Selections from all your academic shelves');
+const started=books.filter(b=>['Reading','Finished'].includes(S['book-'+b[0]]));
+head+=card(started.length?started.map(b=>bookRow(b)).join(''):'<div class="empty">Mark books as Reading or Finished in the Anthropology, Mathematics or Complexity tabs to see them here.</div>');
+shell(head);
+}
+function menu(){const list=nav.map(x=>x[1]).join(' · ');return list}
+function openBackup(){
+const content='<h3>Data, backup & preferences</h3><p class="small muted">Your checked courses, assignment evidence, local deadlines, notes, study sessions and reading status live in this device’s browser storage.</p><div class="actions-row"><button class="btn primary" onclick="Degree.exportData()">Download JSON backup</button></div><label class="field">Restore from backup<input type="file" accept="application/json,.json" onchange="Degree.importData(this)"></label><p class="footnote">Restoring replaces saved local data. No cloud sync or notifications are implemented.</p><div class="actions-row"><button class="btn" onclick="Degree.closeModal()">Close</button></div>';
+document.getElementById('modal').innerHTML='<div>'+content+'</div>';document.getElementById('modal').classList.remove('hide');
+}
+const Degree={
+go(h){goto(h)},
+sub(s){sub=s;search='';render();document.getElementById('view').scrollIntoView({block:'start'})},
+filter(s){search=s;renderAnth();const el=document.getElementById('anthSearch');if(el){el.focus();el.setSelectionRange(s.length,s.length)}},
+filterSem(v){S.anthSem=Number(v);store();renderAnth()},
+set(key,val){S[key]=val;store();render()},
+saveInput(el){S[el.dataset.key]=el.value;store();render()},
+addTask(domain){const title=document.getElementById('newTask').value.trim(),date=document.getElementById('newDate').value,kind=document.getElementById('newKind').value,source=document.getElementById('newSource').value.trim();if(!title){alert('Enter a task title.');return}if(source&&!safeURL(source)){alert('Enter a valid https:// source URL, or leave it blank.');return}S.customTasks=S.customTasks||[];S.customTasks.push({id:'t'+Date.now().toString(36),title:title,date:date,domain:domain,kind:kind,source:source,done:false});store();render()},
+taskToggle(id,v){(S.customTasks||[]).forEach(x=>{if(x.id===id)x.done=v});store();render()},
+taskDelete(id){if(confirm('Remove this milestone?')){S.customTasks=(S.customTasks||[]).filter(x=>x.id!==id);store();render()}},
+logStudy(){const min=Number(document.getElementById('logMinutes').value);if(!Number.isFinite(min)||min<5||min>600){alert('Enter minutes from 5 to 600');return}const dt=new Date();const localDate=dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');S.sessions=S.sessions||[];S.sessions.push({date:localDate,minutes:min,domain:document.getElementById('logDomain').value});store();render()},
+resetWeek(){if(confirm('Reset suggested weekly checkmarks?')){for(let i=0;i<7;i++)S['weekly-'+i]=false;store();render()}},
+backup:openBackup,
+closeModal(){document.getElementById('modal').classList.add('hide')},
+toggleTheme(){document.body.classList.toggle('night');S.theme=document.body.classList.contains('night')?'night':'light';store();drawNav()},
+exportData(){const blob=new Blob([JSON.stringify({app:'Degree Atlas',version:2,exported:new Date().toISOString(),data:S},null,2)],{type:'application/json'});const u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download='degree-atlas-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),2000)},
+importData(input){const file=input.files&&input.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(){try{const src=JSON.parse(reader.result);const data=src&&src.app==='Degree Atlas'?src.data:src;if(!data||typeof data!=='object'||Array.isArray(data))throw Error('Invalid object');if(confirm('Replace all locally saved Degree Atlas progress with this backup?')){S=data;store();Degree.closeModal();render()}}catch(e){alert('Backup could not be read: '+e.message)}};reader.readAsText(file)}
+};
+window.Degree=Degree;
+if(S.theme==='night')document.body.classList.add('night');
+document.getElementById('nightbtn').onclick=Degree.toggleTheme;
+document.getElementById('backupbtn').onclick=openBackup;
+document.getElementById('modal').onclick=function(e){if(e.target===this)Degree.closeModal()};
+window.addEventListener('hashchange',route);
+route();
+})();
