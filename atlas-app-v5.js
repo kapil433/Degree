@@ -27,6 +27,12 @@ const learningMethods=[
 ['Metacognition','Check whether you can independently explain and apply a concept; do not equate familiarity with mastery.','Weekly review and exam preparation','https://doi.org/10.1177/1529100612453266','Dunlosky et al. (2013)']
 ];
 const toolsByTopic=[
+{words:/graph|network|centrality|cluster|social|mobility/i,name:'Gephi',kind:'Network visualization',url:'https://gephi.org/',why:'Explore network structure and community patterns visually.'},
+{words:/research|fieldwork|ethnograph|qualitative|anthropolog|social/i,name:'Zotero',kind:'Reference management',url:'https://www.zotero.org/',why:'Organize citations, annotate PDFs and build bibliographies.'},
+{words:/statistics|probability|correlation|linear algebra|analysis/i,name:'Desmos',kind:'Mathematical visualization',url:'https://www.desmos.com/calculator',why:'Experiment with equations and parameter changes.'},
+{words:/simulation|agent|complex|system|contagion/i,name:'Mesa (Python)',kind:'Agent-based modelling',url:'https://mesa.readthedocs.io/',why:'Implement inspectable agent-based models in Python.'},
+{words:/text|ethnograph|linguistic|NLP|language/i,name:'Voyant Tools',kind:'Text exploration',url:'https://voyant-tools.org/',why:'Explore word frequencies, contexts and textual patterns.'},
+{words:/program|algorith|computation|simulation|analysis/i,name:'Observable Plot',kind:'Interactive data graphics',url:'https://observablehq.com/plot/',why:'Design explanatory visualizations for research data.'},
 {words:/network|graph|diffusion|contagion|social|mobility|robust|cascad/i,name:'NetworkX',kind:'Python',url:'https://networkx.org/documentation/stable/',why:'Create networks, centrality measures and diffusion experiments.'},
 {words:/network|graph|diffusion|contagion|social|segregation|agent|cultural|evolution/i,name:'NetLogo Models Library',kind:'Interactive lab',url:'https://ccl.northwestern.edu/netlogo/models/',why:'Explore social dynamics and agent-based simulation.'},
 {words:/differential|dynamic|chaos|stability|bifurcat|equation|calculus|fluid|wave/i,name:'GeoGebra Graphing',kind:'Interactive mathematics',url:'https://www.geogebra.org/graphing',why:'Visualise functions and dynamical relationships.'},
@@ -171,7 +177,7 @@ return panel('<div class="paper-meta">'+badge(x.publication_year||'n.d.')+' '+ba
 async function fetchResearch(field,query){
 const target=el('livepapers');if(!target)return;
 target.innerHTML=panel('<p>Searching scholarly metadata for “'+esc(query)+'”...</p>');
-const urlAPI='https://api.openalex.org/works?search='+encodeURIComponent(query)+'&filter=type:article&per-page=25&sort=cited_by_count:desc&select=id,title,publication_year,doi,type,cited_by_count,authorships,primary_location,best_oa_location';
+const urlAPI='https://api.openalex.org/works?search='+encodeURIComponent(query)+'&filter=type:article&per-page=100&sort=cited_by_count:desc&select=id,title,publication_year,doi,type,cited_by_count,authorships,primary_location,best_oa_location';
 try{
 const res=await fetch(urlAPI,{headers:{Accept:'application/json'}});if(!res.ok)throw new Error('OpenAlex returned HTTP '+res.status);
 const data=await res.json();const works=(data.results||[]).filter(x=>x.title);
@@ -182,11 +188,12 @@ paperData[field]={html,query};target.innerHTML=html;
 }
 function essaysView(field){
 const topics=journalTopics[field]||[],providers=articlePortals[field];
+const chosen=S['essayTopic:'+field]||topics[0];
 let h=panel('<div class="eyebrow">ESSAYS, ARTICLES, VIDEOS</div><h3>Accessible writing around the big ideas.</h3><p>Explore reputable publications and open courses by topic. These are source collections, not an invented list of 100 individually verified article titles. Papers remain separate in the Research view.</p>','notice');
 h+=section('Choose a theme')+'<div class="chiprow">'+topics.map(x=>'<button class="topicchip" onclick="Atlas.setEssayTopic('+JSON.stringify(x).replace(/"/g,'&quot;')+')">'+esc(x)+'</button>').join('')+'</div>';
-h+=panel('<div class="eyebrow">FOCUS TOPIC</div><h3>'+esc(activeTopic||topics[0])+'</h3><p>Explore quality essays, explainers and open university resources. Use publication-site searches for the exact topic.</p><div class="actionrow">'+link('https://www.google.com/search?q='+encodeURIComponent((activeTopic||topics[0])+' site:quantamagazine.org OR site:sapiens.org OR site:plus.maths.org OR site:santafe.edu'),'Search essays on topic')+link('https://www.youtube.com/results?search_query='+encodeURIComponent((activeTopic||topics[0])+' university lecture'),'Find lectures')+'</div>');
+h+=panel('<div class="eyebrow">FOCUS TOPIC</div><h3>'+esc(chosen)+'</h3><p>Explore quality essays, explainers and open university resources. Use publication-site searches for the exact topic.</p><div class="actionrow">'+link('https://www.google.com/search?q='+encodeURIComponent((chosen)+' site:quantamagazine.org OR site:sapiens.org OR site:plus.maths.org OR site:santafe.edu'),'Search essays on topic')+link('https://www.youtube.com/results?search_query='+encodeURIComponent((chosen)+' university lecture'),'Find lectures')+'</div>');
 h+=section('Explore trusted publications')+'<div class="toolgrid">'+providers.map(x=>panel('<h3>'+esc(x[0])+'</h3><p>'+esc(x[2])+'</p>'+link(x[1],'Explore publication'))).join('')+'</div>';
-h+=section('Related labs and videos')+toolCards(activeTopic||topics[0]);
+h+=section('Related labs and videos')+toolCards(chosen);
 return h;
 }
 function academicPlanner(field){
@@ -259,9 +266,9 @@ if(page==='projects'&&(!tab||tab==='labs'))simDraw();
 function searchCourse(v){set('courseSearch',v);const input=el('course-search');const p=input?.selectionStart;paint();const next=el('course-search');if(next){next.focus();next.setSelectionRange(p,p)}}
 function setStage(v){set('stage',v);paint()}
 function showTopic(value){activeTopic=value;paint()}
-function discover(fieldPage,topic,type){set('query:'+(fieldPage==='math'?'Mathematics':fieldPage==='anth'?'Anthropology':'Complexity'),topic);paperQuery=topic;go(fieldPage+'/'+type)}
+function discover(fieldPage,topic,type){const field=fieldPage==='math'?'Mathematics':fieldPage==='anth'?'Anthropology':'Complexity';set('query:'+field,topic);set('essayTopic:'+field,topic);paperQuery=topic;go(fieldPage+'/'+type)}
 function topicSearch(t){paperQuery=t;const x=el('research-q');if(x)x.value=t;fetchResearch(fieldFromPage(),t)}
-function essayTopic(t){activeTopic=t;paint()}
+function essayTopic(t){set('essayTopic:'+fieldFromPage(),t);activeTopic=t;paint()}
 function searchPapers(){const input=el('research-q');const q=input?.value.trim()||'network science';set('query:'+fieldFromPage(),q);paperQuery=q;fetchResearch(fieldFromPage(),q)}
 function rate(id,good){const x=S['review:'+id]||{n:0};const n=good?Math.min(5,x.n+1):0,interval=[1,1,3,7,14,30][n],d=new Date();d.setDate(d.getDate()+interval);set('review:'+id,{n,date:d.toISOString().slice(0,10)});paint()}
 function logTime(){const x=Number(el('log-time')?.value);if(!Number.isFinite(x)||x<5||x>600){alert('Enter 5–600 minutes.');return}const a=Array.isArray(S.sessions)?S.sessions:[];a.push({minutes:x,date:new Date().toISOString().slice(0,10)});set('sessions',a);paint()}
