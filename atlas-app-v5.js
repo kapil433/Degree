@@ -128,6 +128,29 @@ if(!matches.length)return h+panel('<p>No courses match. Clear your filters.</p>'
 h+='<div class="coursegrid">'+matches.map(c=>'<button class="courseitem" onclick="Atlas.course(\''+c.id+'\')"><div class="course-top"><span class="mono">'+esc(c.id)+'</span>'+badge(cLabel(c))+'</div><h3>'+esc(c.title)+'</h3><p>'+esc(c.topics.slice(0,3).join(' · '))+'</p><div class="course-bottom"><span>'+esc(c.book||'Open resource available')+'</span><span class="arrow">↗</span></div></button>').join('')+'</div>';
 return h;
 }
+const coursePaperMap={
+'MAN-103':['Body Ritual among the Nacirema','Thick Description'],
+'MAN-107':['The Tragedy of the Commons'],
+'MANE-107':['Complex Contagion and the Weakness of Long Ties'],
+'DMMEC1':['On Computable Numbers','A Mathematical Theory of Communication'],
+'DMMEC2':['Deterministic Nonperiodic Flow','Collective Dynamics'],
+'DMMEC4':['Attention Is All You Need'],
+'DMM1103':['Deterministic Nonperiodic Flow'],
+'DMM1201':['Deterministic Nonperiodic Flow'],
+'CX02':['Deterministic Nonperiodic Flow'],
+'CX04':['Collective Dynamics','Emergence of Scaling'],
+'CX05':['Complex Contagion and the Weakness of Long Ties'],
+'CX08':['Emergence of Scaling'],
+'CX09':['A Mathematical Theory of Communication'],
+'CX10':['Collective Dynamics']
+};
+function selectedPaperBox(c){
+const patterns=coursePaperMap[c.id]||[];
+const selected=C.initialRead.filter(x=>x.type==='paper'&&patterns.some(p=>x.title.toLowerCase().includes(p.toLowerCase())));
+if(!selected.length)return '';
+return section('Selected landmark readings','A few primary works connected to this course')
++'<div class="articlelist">'+selected.map(p=>panel('<div class="paper-meta">'+badge(p.year)+' '+badge(p.domain)+'</div><h3>'+esc(p.title)+'</h3><p>'+esc(p.authors)+'</p>'+link(p.url,'Read source / DOI'))).join('')+'</div>';
+}
 function courseDetail(c){
 let h='<button class="back" onclick="Atlas.go(\''+page+'/courses\')">← All courses</button>';
 h+='<div class="detailhead"><div class="eyebrow">'+esc(c.tag)+' · '+esc(c.id)+' · '+esc(cLabel(c))+'</div><h2>'+esc(c.title)+'</h2><p>'+esc(c.description)+'</p><label class="check"><input type="checkbox" '+(completed(c)?'checked':'')+' onchange="Atlas.mark(\''+c.id+'\',this.checked)"> Mark learning milestone complete</label></div>';
@@ -135,6 +158,7 @@ h+=section('Core topics','Explore the broad themes in this course')+'<div class=
 if(activeTopic)h+=panel('<div class="eyebrow">SELECTED TOPIC</div><h3>'+esc(activeTopic)+'</h3><p>Explore scholarship, accessible explanations and related labs for this topic.</p><div class="actionrow"><button class="btn primary" onclick="Atlas.go(\''+page+'/research\')">Find research papers</button><button class="btn" onclick="Atlas.go(\''+page+'/essays\')">Essays & lectures</button></div>');
 h+=section('Where to learn','One primary text and one open learning resource')+'<div class="duogrid">'+panel('<div class="resource-kicker">PRIMARY REFERENCE</div><h3>'+esc(c.book||'Reference pending selection')+'</h3><p>'+esc(c.author||'Choose an open educational starting point')+'</p><p>'+esc(c.note||'Recommended as a supplementary starting point; consult the official syllabus for scope.')+'</p>'+link('https://openlibrary.org/search?q='+encodeURIComponent(c.book+' '+c.author),'Find book / edition'))+panel('<div class="resource-kicker">OPEN LEARNING</div><h3>Open course or reputable learning collection</h3><p>When a close course match is unavailable, this link is a relevant open resource—not a verified full-syllabus equivalent.</p>'+link(c.open,'Explore resource'))+'</div>';
 h+=section('Discover beyond the course','Connect concepts with research, media and tools')+'<div class="featuregrid">'+panel('<div class="feature-icon">⌕</div><h3>Research papers</h3><p>Search primary scholarship about '+esc(c.topics[0]||c.title)+'.</p><button class="textbutton" onclick="Atlas.discover(\''+page+'\',\''+esc(c.topics[0]||c.title).replace(/'/g,'&#39;')+'\',\'research\')">Explore papers →</button>')+panel('<div class="feature-icon">▤</div><h3>Essays & articles</h3><p>Public-facing essays and explanatory reading in this area.</p><button class="textbutton" onclick="Atlas.discover(\''+page+'\',\''+esc(c.topics[0]||c.title).replace(/'/g,'&#39;')+'\',\'essays\')">Explore essays →</button>')+panel('<div class="feature-icon">⚗</div><h3>Interesting labs</h3><p>Relevant simulations, videos and practical environments.</p><button class="textbutton" onclick="Atlas.go(\'projects/labs\')">Open lab →</button>')+'</div>';
+h+=selectedPaperBox(c);
 h+=section('Practical tools and lectures')+toolCards(c.topics.join(' '),4);
 if(c.tag==='IGNOU MAANY')h+=panel('<h3>Official university resources</h3><p>Use these central links to confirm unit content, assignment applicability and examination instructions.</p><div class="links">'+link(C.official.ignouGuide,'MAANY programme guide')+link(C.official.ignouAssignments,'Assignment notices')+'</div>');
 if(c.tag==='MUJ MSc')h+=panel('<h3>Official MSc syllabus</h3><p>Course title, code, credits and the Computational Science elective pathway follow the MUJ programme documentation. Assessment dates are set in the LMS.</p>'+link(C.official.muJPPR,'Detailed official MUJ syllabus'));
