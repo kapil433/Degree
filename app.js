@@ -127,7 +127,7 @@ const adminTasks=[
 ['adm9','Review MUJ writing tablet requirement for assessments','Mathematics'],
 ['adm10','Confirm MUJ elective selection and project-track approval','Mathematics']
 ];
-const nav=[['anth','Anthropology','◈'],['math','Mathematics','∑'],['complex','Complexity','◎'],['library','Alexandria','▤']];
+const nav=[['home','Home','⌂'],['anth','Anthropology','◈'],['math','Mathematics','∑'],['complex','Complexity','◎'],['learning','Learning Lab','✦'],['studio','AI & Projects','⚗'],['library','Alexandria','▤']];
 let S={};
 try{S=JSON.parse(localStorage.getItem('degree-atlas-v2')||'{}');if(!S||typeof S!=='object'||Array.isArray(S))S={}}catch(e){S={}}
 if(!S.migrated){
@@ -154,9 +154,12 @@ function dateStatus(dt){if(!dt)return 'Date not entered';const date=new Date(dt+
 function thisWeekMinutes(){const now=new Date(),ago=new Date(now.getTime()-7*86400000);return (S.sessions||[]).reduce((n,x)=>{const d=new Date(x.date+'T12:00:00');return d>=ago&&d<=now?n+Number(x.minutes||0):n},0)}
 function metrics(title,num,desc,percent){return card('<div class="metric-label">'+html(title)+'</div><div class="metric-number mono">'+html(num)+'</div>'+ (percent!==undefined?progress(percent):'')+'<div class="metric-foot">'+html(desc)+'</div>')}
 function filters(sub,id,options){return '<div class="seg" role="group" aria-label="'+html(sub)+'">'+options.map(x=>'<button class="'+(id===x[0]?'active':'')+'" onclick="Degree.sub(\''+x[0]+'\')">'+html(x[1])+'</button>').join('')+'</div>'}
-function drawNav(){document.getElementById('side-nav').innerHTML=nav.map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\''+n[0]+'\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('mobile-nav').innerHTML=nav.map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\''+n[0]+'\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('nightbtn').textContent=document.body.classList.contains('night')?'☀':'☾'}
-let page='anth',sub='overview',mathSub='foundations',complexSub='research',search='';
+function drawNav(){document.getElementById('side-nav').innerHTML=nav.map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\''+n[0]+'\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('mobile-nav').innerHTML=nav.filter(n=>['home','anth','math','complex','learning'].includes(n[0])).map(n=>'<button class="'+(page===n[0]?'active':'')+'" onclick="Degree.go(\''+n[0]+'\')"><span class="glyph">'+n[2]+'</span>'+n[1]+'</button>').join('');document.getElementById('nightbtn').textContent=document.body.classList.contains('night')?'☀':'☾'}
+let page='home',sub='overview',mathSub='foundations',complexSub='research',search='';
 const intros={
+home:['YOUR LEARNING SPACE','The Degree Atlas','Study with intention. Explore ideas. Make something original.','Today · Across disciplines'],
+learning:['LEARN HOW TO LEARN','Learning Lab','Evidence-based practice, retrieval, memory and reflection.','Memory · Mastery · Practice'],
+studio:['RESEARCH AND BUILD','AI & Projects','Think independently, use AI critically and turn questions into working experiments.','AI · Experiments · Research'],
 anth:['THE HUMAN SCIENCES','Anthropology','Culture, evolution, environment and the everyday lives of people.','IGNOU · MAANY · July 2026 application'],
 math:['FROM FIRST PRINCIPLES','Mathematics','Rebuild undergraduate foundations; then climb to MUJ MSc mathematics with confidence.','MUJ · MSc Mathematics · 81 credits'],
 complex:['THE INTERDISCIPLINARY LAB','Complexity Science','A research programme connecting ethnography, equations, networks and social-technical change.','Research · Networks · Simulation'],
@@ -164,8 +167,8 @@ library:['YOUR PERSONAL KNOWLEDGE ATLAS','Alexandria','A doorway into your large
 };
 function hero(key,cta,label,secondary,secondaryLabel){const d=intros[key];return '<div class="hero"><div class="eyebrow">'+html(d[0])+'</div><h1>'+html(d[1])+'</h1><p>'+html(d[2])+'</p>'+(cta?L(cta,label,'lightbutton'):'')+(secondary?L(secondary,secondaryLabel,'ghostbutton'):'')+'<div style="margin-top:20px;font-size:.73rem;color:#b8c4e2">'+html(d[3])+'</div></div>'}
 function goto(h){if(location.hash!=='#'+h)location.hash=h;else route()}
-function route(){let h=(location.hash||'#anth').replace('#','');if(!nav.some(x=>x[0]===h))h='anth';page=h;sub=h==='math'?'foundations':h==='complex'?'research':'overview';search='';render();window.scrollTo({top:0,behavior:'instant'})}
-function render(){drawNav();setTitle(nav.find(x=>x[0]===page)[1]);if(page==='anth')renderAnth();else if(page==='math')renderMath();else if(page==='complex')renderComplex();else renderLibrary()}
+function route(){let h=(location.hash||'#anth').replace('#','');if(!nav.some(x=>x[0]===h))h='home';page=h;sub=h==='math'?'foundations':h==='complex'?'research':'overview';search='';render();window.scrollTo({top:0,behavior:'instant'})}
+function render(){drawNav();setTitle(nav.find(x=>x[0]===page)[1]);if(page==='home')renderHome();else if(page==='anth')renderAnth();else if(page==='math')renderMath();else if(page==='complex')renderComplex();else if(page==='learning')renderLearning();else if(page==='studio')renderStudio();else renderLibrary()}
 function buttonSub(id,label){return '<button onclick="Degree.sub(\''+id+'\')" class="'+(sub===id?'active':'')+'">'+html(label)+'</button>'}
 function viewTabs(options){return '<div class="toolbar"><div class="seg">'+options.map(x=>buttonSub(x[0],x[1])).join('')+'</div></div>'}
 function authResource(){return '<div>'+chip(U.prospectus,'July 2026 prospectus')+chip(U.guide,'MAANY programme guide')+chip(U.egy,'eGyanKosh MAANY')+chip(U.assign,'Official assignments')+chip(U.calendar,'IGNOU calendar')+'</div>'}
@@ -291,12 +294,108 @@ const started=books.filter(b=>['Reading','Finished'].includes(S['book-'+b[0]]));
 head+=card(started.length?started.map(b=>bookRow(b)).join(''):'<div class="empty">Mark books as Reading or Finished in the Anthropology, Mathematics or Complexity tabs to see them here.</div>');
 shell(head);
 }
+
+const evidence=[
+['Retrieval practice','Practice recalling without looking at notes; use feedback to correct errors.','Roediger & Karpicke (2006)','https://doi.org/10.1111/j.1467-9280.2006.01693.x'],
+['Distributed practice','Space practice over time rather than cramming.','Cepeda et al. (2006)','https://doi.org/10.1037/0033-2909.132.3.354'],
+['Practice testing and elaboration','Testing and explanation can improve retention; choose strategy to suit task.','Dunlosky et al. (2013)','https://doi.org/10.1177/1529100612453266'],
+['Cognitive load','Use worked examples early, then progressively remove support.','Sweller (1988)','https://doi.org/10.1207/s15516709cog1202_4'],
+['Implementation intentions','Specify when, where and how to act on goals.','Gollwitzer (1999)','https://doi.org/10.1037/0003-066X.54.7.493'],
+['Method of loci','Use memorable spatial imagery to encode ordered information; it is not a substitute for conceptual understanding.','Maguire et al. (2003)','https://doi.org/10.1038/nn988']
+];
+const cards=[
+['anth-culture','What does culture explain?','Anthropology','Explain cultural variation without assuming that every behaviour has one cause.'],
+['math-proof','Prove that the square root of 2 is irrational.','Mathematics','Try contradiction. State every assumption.'],
+['complex-diffusion','When can a local behaviour become a global cascade?','Complexity','Compare simple contagion and threshold diffusion.'],
+['math-linear','Why do eigenvectors matter?','Mathematics','Connect linear transformations to repeated dynamics.'],
+['anth-field','How would you study transport choice ethnographically?','Anthropology','Design observations, sampling and informed consent.'],
+['complex-abm','How can agent rules create segregation?','Complexity','Explain the Schelling model and its limitations.']
+];
+const aiModes=[
+['Socratic tutor','Ask one question at a time. Do not reveal the answer immediately. Diagnose my assumptions, offer progressive hints, and end with a new problem I must solve unaided.'],
+['Proof coach','Review my mathematical proof. Identify the first unjustified step and ask me to repair it before providing a model proof. Distinguish intuition from rigorous argument.'],
+['Ethnography critic','Critique my anthropological research question for sampling bias, positionality, ethical risks, alternative interpretations and evidence gaps. Ask for context before assuming facts.'],
+['Simulation partner','Help design a reproducible Python experiment. Define assumptions, parameters, observables, controls, uncertainty and falsification tests before coding.'],
+['Literature analyst','Help me compare the arguments, methods and limitations of the papers I provide. Do not invent citations. Mark unsupported claims and propose database searches.'],
+['Writing critic','Challenge the logic, evidence, counterarguments and clarity of my draft. Give prioritized feedback without rewriting everything for me.']
+];
+const projects=[
+['p1','Cultural Diffusion Simulator','Model threshold adoption on heterogeneous social networks.','NetworkX, Python, interviews'],
+['p2','Mobility Adoption Observatory','Combine public registrations with policy and infrastructure changes.','Data analysis, causal diagrams'],
+['p3','Computational Ethnography Toolkit','Ethics-first qualitative coding and cross-case comparison.','Text analysis, field methods'],
+['p4','Urban Resilience Lab','Explore transport-network failures and access inequalities.','Graphs, Monte Carlo'],
+['p5','Norms & Coordination Sandbox','Compare coordination games and social conventions.','Game theory, ABM'],
+['p6','Mobility Inequality Atlas','Map differences in access to transport across communities.','GIS, spatial statistics'],
+['p7','Institutional Evolution Model','Simulate feedback between institutions and individual strategies.','Evolutionary games'],
+['p8','Research Knowledge Graph','Link concepts, sources, evidence and research questions.','Graph databases, citation data']
+];
+function renderHome(){
+let h=hero('home',null,null,null,null);
+const p1=donePct('done-',MA.slice(0,10)),p2=donePct('found-',foundations),mins=thisWeekMinutes(),review=cards.filter(x=>dueCard(x[0])).length;
+h+='<div class="grid four">'+metrics('Anthropology',p1+'%','First-year courses marked complete',p1)+metrics('Mathematics',p2+'%','Foundation modules completed',p2)+metrics('Last 7 days',(mins/60).toFixed(1)+'h','Actual study time logged')+metrics('Practice queue',review,'Questions ready for recall')+'</div>';
+h+=sec('Continue learning','Your next useful action');
+h+='<div class="grid three">'+card('<div class="eyebrow">ANTHROPOLOGY</div><h3>Explore the curriculum</h3><p>Read a course, identify key debates, then test your understanding.</p><button class="btn primary" onclick="Degree.go(&quot;anth&quot;)">Continue anthropology</button>')+card('<div class="eyebrow">MATHEMATICS</div><h3>Build mathematical maturity</h3><p>Work from proofs and calculus towards graduate mathematics.</p><button class="btn primary" onclick="Degree.go(&quot;math&quot;)">Continue mathematics</button>')+card('<div class="eyebrow">LEARNING LAB</div><h3>Recall before rereading</h3><p>Try an active-recall question and schedule your next review.</p><button class="btn primary" onclick="Degree.go(&quot;learning&quot;)">Review concepts</button>')+'</div>';
+h+=sec('Explore across disciplines');
+h+=card('<div class="node-map"><svg viewBox="0 0 740 190" role="img" aria-label="Anthropology, mathematics and complexity are connected through original research"><g stroke="#9db4db" opacity=".7" stroke-width="2"><path d="M130 95 L365 95 L610 95 M130 95 Q370 -60 610 95 M130 95 Q370 245 610 95" fill="none"/></g><g fill="#465c94"><circle cx="130" cy="95" r="65"/><circle cx="610" cy="95" r="65"/></g><circle cx="365" cy="95" r="73" fill="#5958b7"/><g text-anchor="middle" font-size="15"><text x="130" y="91">Human</text><text x="130" y="110">systems</text><text x="365" y="91">Complexity</text><text x="365" y="110">science</text><text x="610" y="91">Mathematical</text><text x="610" y="110">models</text></g></svg></div><p class="small muted">Explore original questions about social networks, diffusion, urban resilience and institutions.</p><button class="btn" onclick="Degree.go(&quot;complex&quot;)">Enter the research lab</button>');
+shell(h);
+}
+function dueCard(id){const o=S['review-'+id];return !o||!o.next||o.next<=new Date().toISOString().slice(0,10)}
+function reviewCard(id,quality){
+const old=S['review-'+id]||{step:0};
+const step=quality==='again'?0:Math.min(5,(old.step||0)+1);
+const gaps=[1,1,3,7,14,30],d=new Date();d.setDate(d.getDate()+gaps[step]);const next=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+S['review-'+id]={step:step,next:next,last:new Date().toISOString(),quality:quality};store();render();
+}
+function renderLearning(){
+let h=hero('learning',null,null,null,null)+viewTabs([['practice','Active recall'],['science','Learning science'],['memory','Memory palace'],['goals','Goals & reflection']]);
+if(sub==='practice'){
+const due=cards.filter(x=>dueCard(x[0]));
+h+=notice('Review scheduler','A transparent 1, 3, 7, 14 and 30-day interval ladder is used for practice prompts. It is a simple planner, not a validated measurement of mastery.');
+h+=sec('Active recall','Attempt before revealing guidance');
+h+='<div class="grid two">'+(due.length?due.map(x=>card('<div class="course-top">'+pill(x[2],'purple')+'</div><h3>'+html(x[1])+'</h3><details class="course-detail"><summary>Reveal guidance</summary><p>'+html(x[3])+'</p></details><div class="actions-row"><button class="btn" onclick="Degree.review(&quot;'+x[0]+'&quot;,&quot;again&quot;)">Need more practice</button><button class="btn primary" onclick="Degree.review(&quot;'+x[0]+'&quot;,&quot;good&quot;)">Recalled successfully</button></div>')).join(''):card('<h3>All scheduled questions reviewed</h3><p>Return tomorrow, or revisit the reading shelves and write new questions.'))+'</div>';
+h+=sec('Error journal')+card('<label class="field">What did I misunderstand, and how will I test the correction?<textarea onchange="Degree.set(&quot;errorJournal&quot;,this.value)">'+html(S.errorJournal||'')+'</textarea></label>');
+}else if(sub==='science'){
+h+=notice('Research interpretation','Evidence differs by task and learner. Strategies should be applied thoughtfully; no single technique guarantees learning.');
+h+='<div class="grid two">'+evidence.map(x=>card('<h3>'+html(x[0])+'</h3><p>'+html(x[1])+'</p><div class="small muted">'+html(x[2])+'</div><div class="source-links">'+L(x[3],'Read study')+'</div>')).join('')+'</div>';
+}else if(sub==='memory'){
+h+=sec('Build a memory palace','A mnemonic for sequences, not a replacement for mathematical reasoning');
+h+=card('<p>Choose a familiar route and assign one vivid image to each location. Test yourself by mentally walking the route in order.</p><div class="grid two">'+['Front door','Hallway','Kitchen','Desk','Window','Garden'].map((x,i)=>'<label class="field">'+(i+1)+'. '+x+'<input data-memory="'+i+'" placeholder="What will you remember here?" value="'+att((S.palace||[])[i]||'')+'" onchange="Degree.palace(this)"></label>').join('')+'</div><div class="actions-row"><button class="btn" onclick="Degree.palaceTest()">Practice recall</button></div><p class="small muted">Inspired by the method of loci, discussed in Moonwalking with Einstein. See the research references for evidence and limitations.</p>');
+}else{
+h+=sec('Study intentions','Set realistic goals with specific conditions');
+h+=card('<div class="formgrid"><label class="field">This week I will focus on<input data-key="goal" value="'+att(S.goal||'')+'" onchange="Degree.saveInput(this)" placeholder="e.g. epsilon-delta proofs"></label><label class="field">When and where<input data-key="intention" value="'+att(S.intention||'')+'" onchange="Degree.saveInput(this)" placeholder="e.g. 7:30pm at my desk"></label></div><label class="field">Weekly reflection<textarea data-key="reflection" onchange="Degree.saveInput(this)">'+html(S.reflection||'')+'</textarea></label>');
+h+=routineUI();
+}
+shell(h);
+}
+function renderStudio(){
+let h=hero('studio',null,null,null,null)+viewTabs([['projects','Project studio'],['ai','AI study modes'],['concepts','Concept explorer']]);
+if(sub==='projects'){
+h+=notice('Project maturity','These are research and product hypotheses. Publication-level novelty, datasets and ethics require verification before implementation.');
+h+=sec('Build something worth investigating','Eight project starting points');
+h+='<div class="grid two">'+projects.map(x=>card('<div class="row-between">'+pill('Prototype idea','purple')+'<label class="checkline small"><input type="checkbox" '+(S['project-'+x[0]]?'checked':'')+' onchange="Degree.set(&quot;project-'+x[0]+'&quot;,this.checked)"> Active</label></div><h3>'+html(x[1])+'</h3><p>'+html(x[2])+'</p><div class="small muted">'+html(x[3])+'</div>')).join('')+'</div>';
+h+=sec('Project notes')+card('<label class="field">Hypothesis → evidence → prototype → limitations<textarea data-key="projectNotes" onchange="Degree.saveInput(this)">'+html(S.projectNotes||'')+'</textarea></label>');
+}else if(sub==='ai'){
+h+=notice('Real AI, not simulated AI','These are copyable prompts for a connected assistant. This static website does not send prompts to an AI model or grade your answers.');
+h+=sec('Choose a learning mode','Ask for hints and critique before solutions');
+h+='<div class="grid two">'+aiModes.map((x,i)=>card('<h3>'+html(x[0])+'</h3><p>'+html(x[1])+'</p><button class="btn" onclick="Degree.copyAI('+i+')">Copy learning prompt</button>')).join('')+'</div>';
+h+=sec('A useful AI workflow')+card('<div class="timeline">'+[['1','Attempt alone','Write your own solution or hypothesis'],['2','Ask for a hint','Request one question or a diagnostic hint'],['3','Verify','Check against course notes, proofs or primary research'],['4','Transfer','Solve a different problem without assistance']].map(x=>'<div class="timeline-item"><span class="stepbadge">'+x[0]+'</span><div><h4>'+x[1]+'</h4><p>'+x[2]+'</p></div></div>').join('')+'</div>');
+}else{
+const concepts=[['Diffusion','Social contagion','Differential equations','Networks','Adoption models'],['Emergence','Institutions','Nonlinear systems','Agent-based modelling','Coordination'],['Resilience','Community adaptation','Graph robustness','Cascades','Infrastructure'],['Scaling','Urban anthropology','Power laws','Complex systems','Cities'],['Evolution','Cultural transmission','Probability','Evolutionary games','Norms']];
+h+=sec('Ideas across disciplines','Choose a bridge from theory to experiment');
+h+='<div class="grid two">'+concepts.map(x=>card('<h3>'+x[0]+'</h3><div class="course-detail"><p><b>Anthropology:</b> '+x[1]+'</p><p><b>Mathematics:</b> '+x[2]+'</p><p><b>Complexity:</b> '+x[3]+'</p><p><b>Application:</b> '+x[4]+'</p></div>')).join('')+'</div>';
+}
+shell(h);
+}
 function menu(){const list=nav.map(x=>x[1]).join(' · ');return list}
 function openBackup(){
 const content='<h3>Data, backup & preferences</h3><p class="small muted">Your checked courses, assignment evidence, local deadlines, notes, study sessions and reading status live in this device’s browser storage.</p><div class="actions-row"><button class="btn primary" onclick="Degree.exportData()">Download JSON backup</button></div><label class="field">Restore from backup<input type="file" accept="application/json,.json" onchange="Degree.importData(this)"></label><p class="footnote">Restoring replaces saved local data. No cloud sync or notifications are implemented.</p><div class="actions-row"><button class="btn" onclick="Degree.closeModal()">Close</button></div>';
 document.getElementById('modal').innerHTML='<div>'+content+'</div>';document.getElementById('modal').classList.remove('hide');
 }
 const Degree={
+review:reviewCard,
+palace(el){const a=S.palace||Array(6).fill('');a[Number(el.dataset.memory)]=el.value;S.palace=a;store()},
+palaceTest(){const a=S.palace||[];alert('Recall each location before checking your entries.\n\n'+['Front door','Hallway','Kitchen','Desk','Window','Garden'].map((x,i)=>x+': '+(a[i]||'—')).join('\n'))},
+copyAI(i){const x=aiModes[i];const prompt=x[0]+'\n\n'+x[1]+'\n\nTopic: [insert my topic]\nMy attempt: [insert my work]';if(typeof navigator!=='undefined'&&navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(prompt).then(()=>alert('Prompt copied')).catch(()=>window.prompt('Copy this prompt:',prompt))}else window.prompt('Copy this prompt:',prompt)},
 go(h){goto(h)},
 sub(s){sub=s;search='';render();document.getElementById('view').scrollIntoView({block:'start'})},
 filter(s){search=s;renderAnth();const el=document.getElementById('anthSearch');if(el){el.focus();el.setSelectionRange(s.length,s.length)}},
