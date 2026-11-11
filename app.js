@@ -173,7 +173,7 @@ function buttonSub(id,label){return '<button onclick="Degree.sub(\''+id+'\')" cl
 function viewTabs(options){return '<div class="toolbar"><div class="seg">'+options.map(x=>buttonSub(x[0],x[1])).join('')+'</div></div>'}
 function authResource(){return '<div>'+chip(U.prospectus,'July 2026 prospectus')+chip(U.guide,'MAANY programme guide')+chip(U.egy,'eGyanKosh MAANY')+chip(U.assign,'Official assignments')+chip(U.calendar,'IGNOU calendar')+'</div>'}
 function renderAnth(){
-let head=hero('anth',U.ignou,'Official programme',U.egy,'Study materials')+viewTabs([['overview','Overview'],['courses','Courses'],['assignments','Assignments'],['reading','Reading'],['admin','Admin']]);
+let head=hero('anth',U.ignou,'Official programme',U.egy,'Study materials')+viewTabs([['overview','Overview'],['courses','Courses'],['assignments','Assignments'],['reading','Books'],['papers','Papers'],['admin','Admin']]);
 if(sub==='overview'){
 const anthCore=MA.slice(0,10),p=donePct('done-',anthCore),submitted=anthCore.filter(x=>['Submitted','Evaluated'].includes(S['a-status-'+x[0]])).length;
 head+=notice('July 2026 cohort · status must be checked','The official MAANY curriculum has 80 credits across four semesters. Application ≠ admission confirmation. First-year assignment PDFs must match your applicable session.','amber');
@@ -196,6 +196,8 @@ head+='<div class="stack">'+MA.filter(c=>c[2]<=2).map(c=>assignmentCard(c)).join
 }else if(sub==='reading'){
 head+=notice('Legitimate book links','Free texts open their official host. Copyrighted books link to catalogue search, not unauthorized downloads.');
 head+=bookShelf('Anthropology · nonfiction')+bookShelf('Anthropology · fiction');
+}else if(sub==='papers'){
+head+=papersUI('Anthropology');
 }else if(sub==='admin'){
 head+=notice('Administrative information','Admission status is editable; this dashboard cannot read your private IGNOU student record or track live university notifications.');
 head+='<div class="grid two">'+card('<h3>IGNOU student profile</h3><div class="formgrid"><label class="field">Admission status<select data-key="admission" onchange="Degree.saveInput(this)">'+['Applied; awaiting confirmation','Confirmed','Enrolment received'].map(v=>'<option '+(S.admission===v?'selected':'')+'>'+v+'</option>').join('')+'</select></label><label class="field">Enrolment / programme code<input data-key="programme" placeholder="e.g. MAANY" value="'+att(S.programme||'')+'" onchange="Degree.saveInput(this)"></label><label class="field">Regional / learner support centre<input data-key="centre" value="'+att(S.centre||'')+'" placeholder="Enter confirmed centre" onchange="Degree.saveInput(this)"></label><label class="field">Personal next check date<input type="date" data-key="admissionCheck" value="'+att(S.admissionCheck||'')+'" onchange="Degree.saveInput(this)"></label></div></div>')+card('<h3>Administrative checklist</h3>'+adminTasks.slice(0,6).map(t=>checkTask(t)).join(''))+'</div>';
@@ -204,17 +206,30 @@ head+=sec('Official academic support')+card(chip(U.ignou,'Programme information'
 }
 function checkTask(t){return '<label class="checkline" style="padding:8px 0;font-size:.85rem"><input type="checkbox" '+(S['task-'+t[0]]?'checked':'')+' onchange="Degree.set(\'task-'+t[0]+'\',this.checked)"><span>'+html(t[1])+'</span></label>'}
 function renderAnthCourse(c){
-const verified=!!c[5],id=c[0];
-return card('<div class="course"><div><div class="course-top">'+pill('Semester '+c[2],'purple')+pill(c[4])+pill(c[3]+' credits')+'</div><div class="course-name">'+html(id+' · '+c[1])+'</div><p class="course-desc">'+html(c[6])+'</p></div><label title="Personal completion only"><input aria-label="Mark course completed" class="course-check" type="checkbox" '+(S['done-'+id]?'checked':'')+' onchange="Degree.set(&quot;done-'+id+'&quot;,this.checked)"></label></div>'+(verified?'<div class="source-links">'+L(c[5],'Open study material')+'</div>':''));
+const id=c[0];return card('<div class="course"><div><div class="course-top">'+pill('Semester '+c[2],'purple')+pill(c[4])+pill(c[3]+' credits')+'</div><div class="course-name">'+html(id+' · '+c[1])+'</div><p class="course-desc">'+html(c[6])+'</p></div><label title="Personal completion only"><input aria-label="Mark course completed" class="course-check" type="checkbox" '+(S['done-'+id]?'checked':'')+' onchange="Degree.set(&quot;done-'+id+'&quot;,this.checked)"></label></div>');
 }
 function assignmentCard(c){
 const id=c[0],status=S['a-status-'+id]||'Not started',date=S['a-due-'+id]||'',url=S['a-url-'+id]||'',proof=S['a-proof-'+id]||'';
 return card('<div class="row-between"><div><div class="course-top">'+pill(id,'purple')+pill('Sem '+c[2])+'</div><h3>'+html(c[1])+'</h3></div>'+pill(status,cls(status))+'</div><div class="formgrid" style="margin-top:13px"><label class="field">Work / submission stage<select data-key="a-status-'+id+'" onchange="Degree.saveInput(this)">'+['Not started','Reading','Drafting','Reviewing','Ready','Submitted','Evaluated'].map(s=>'<option '+(status===s?'selected':'')+'>'+s+'</option>').join('')+'</select></label><label class="field">Verified due date (enter manually)<input type="date" value="'+att(date)+'" data-key="a-due-'+id+'" onchange="Degree.saveInput(this)"></label><label class="field">Applicable official assignment PDF URL<input value="'+att(url)+'" placeholder="Paste verified PDF URL" data-key="a-url-'+id+'" onchange="Degree.saveInput(this)"></label><label class="field">Submission acknowledgement / mark<input value="'+att(proof)+'" data-key="a-proof-'+id+'" placeholder="Receipt / marks / notes" onchange="Degree.saveInput(this)"></label></div><div class="source-links">'+L(U.assign,'Find '+id+' assignment')+(safeURL(url)?L(url,'Your verified PDF'):'')+L(U.grade,'Check grade card')+'</div>'+(date?'<p class="small muted">'+html(dateStatus(date))+' · user-entered date</p>':''));
 }
-function bookShelf(category){const arr=books.filter(b=>b[3]===category);return sec(category,arr.length+' reading picks')+card('<div class="book-list">'+arr.map(b=>bookRow(b)).join('')+'</div>')}
-function bookRow(b){const catalogue='https://openlibrary.org/search?q='+encodeURIComponent(b[1]+' '+b[2]),url=b[5]||catalogue,status=S['book-'+b[0]]||'To read';return '<div class="bookrow"><div><h4>'+html(b[1])+'</h4><p>'+html(b[2]+' · '+b[4])+'</p><div class="tagrow">'+pill(b[5]?'Open educational resource':'Catalogue lookup',b[5]?'green':'')+'</div></div><div><select class="control small" aria-label="Reading status '+att(b[1])+'" onchange="Degree.set(\'book-'+b[0]+'\',this.value)">'+['To read','Reading','Finished'].map(s=>'<option '+(status===s?'selected':'')+'>'+s+'</option>').join('')+'</select><div style="margin-top:6px">'+L(url,b[5]?'Read free':'Find book','linktext')+'</div></div></div>'}
+function bookLevel(b,i){
+const n=Number(b[0].slice(1));
+return n<=8?'Beginner':n<=17?'Intermediate':'Advanced';
+}
+function bookShelf(category){
+const arr=books.filter(b=>b[3]===category).sort((a,b)=>Number(a[0].slice(1))-Number(b[0].slice(1)));
+return sec(category,arr.length+' selected titles')+card('<div class="toolbar"><span class="pill purple">Basic → Intermediate → Advanced</span></div><div class="book-list">'+arr.map((b,i)=>bookRow(b)).join('')+'</div>');
+}
+function bookRow(b){
+const n=Number(b[0].slice(1)),level=bookLevel(b),catalogue='https://openlibrary.org/search?q='+encodeURIComponent(b[1]+' '+b[2]),url=b[5]||catalogue,status=S['book-'+b[0]]||'To read';
+return '<div class="bookrow"><div><div class="course-top">'+pill(String(n).padStart(2,'0'))+pill(level,level==='Beginner'?'green':level==='Intermediate'?'purple':'amber')+'</div><h4>'+html(b[1])+'</h4><p>'+html(b[2]+' · '+b[4])+'</p></div><div><select class="control small" aria-label="Reading status '+att(b[1])+'" onchange="Degree.set(&quot;book-'+b[0]+'&quot;,this.value)">'+['To read','Reading','Finished'].map(t=>'<option '+(status===t?'selected':'')+'>'+t+'</option>').join('')+'</select><div style="margin-top:6px">'+L(url,b[5]?'Open resource':'Find book','linktext')+'</div></div></div>';
+}
+function papersUI(domain){
+const all=(window.DEGREE_PAPERS||[]).filter(x=>x.domain===domain).sort((a,b)=>a.year-b.year);
+return notice('Chronological intellectual history','This is a curated mix of papers, landmark books, chapters and some thematic reading leads, not 100 peer-reviewed articles. Search links are for finding and verifying the correct editions. Bibliographic details need individual checking before formal citation.')+sec('Landmark readings',all.length+' entries · oldest to newest')+card('<div class="book-list">'+all.map((p,i)=>'<div class="bookrow"><div><div class="course-top">'+pill(p.year,'purple')+pill(p.kind)+'</div><h4>'+html(p.title)+'</h4><p>'+html(p.authors)+'</p></div><div><select class="control small" onchange="Degree.set(&quot;paper-'+p.id+'&quot;,this.value)">'+['To read','Reading','Finished'].map(v=>'<option '+(S['paper-'+p.id]===v?'selected':'')+'>'+v+'</option>').join('')+'</select><div style="margin-top:5px">'+L('https://scholar.google.com/scholar?q='+encodeURIComponent(p.title+' '+p.authors),'Find source','linktext')+'</div></div></div>').join('')+'</div>');
+}
 function renderMath(){
-let head=hero('math',U.mujpdf,'Official detailed syllabus',U.muj,'MUJ programme')+viewTabs([['foundations','Undergraduate foundations'],['msc','MUJ MSc'],['planner','Planner & deadlines'],['reading','Books & resources']]);
+let head=hero('math',U.mujpdf,'Official detailed syllabus',U.muj,'MUJ programme')+viewTabs([['foundations','Foundations'],['msc','MUJ MSc'],['planner','Planner'],['reading','Books'],['papers','Papers']]);
 if(sub==='foundations'){
 let n=countDone('found-',foundations),p=donePct('found-',foundations);
 head+=notice('Essential distinction','This undergraduate bridge is an independently designed preparatory track, NOT MUJ coursework and not counted toward its 81 credits.');
@@ -233,6 +248,8 @@ head+=notice('MUJ dates: student-specific','The official programme describes onl
 head+='<div class="grid two">'+card('<h3>Verified MUJ assessment facts</h3><div class="timeline">'+[['01','Continuous assessment','Two assignments of 30 marks each are averaged into the internal component (30%)'],['02','Term-end examinations','Online-proctored, 3 hours, 70 marks; at least 40% separately in IA and TEE'],['03','Graphic pen tablet','University lists Wacom CTL-472 or XP-Pen Star G640 as compatible models'],['04','Project','University lists guide-based and Coursera-based project paths, subject to approval']].map(x=>'<div class="timeline-item"><span class="stepbadge">'+x[0]+'</span><div><h4>'+x[1]+'</h4><p>'+x[2]+'</p></div></div>').join('')+'</div>'+L(U.muj,'Official FAQs','linktext'))+card('<h3>MUJ administrative checklist</h3>'+adminTasks.slice(6).map(t=>checkTask(t)).join('')+'<div class="divider"></div>'+chip(U.mujpdf,'Syllabus PDF')+chip(U.mujdisclosure,'University disclosure')+chip(U.mujlogin,'MUJ official login')+chip(U.mujnotices,'MUJ notices')+'</div>')+'</div>';
 head+=sec('Personal deadlines','Dates you enter from LMS / official notices');
 head+=taskManager('Mathematics');
+}else if(sub==='papers'){
+head+=papersUI('Mathematics');
 }else if(sub==='reading'){
 head+=notice('Math reading guide','Begin with undergraduate resources. The official MUJ PPR document also specifies course-wise textbook references in the detailed syllabus.');
 head+=bookShelf('Mathematics · open textbook')+bookShelf('Mathematics · nonfiction');
@@ -245,7 +262,7 @@ return card('<div class="course"><div><div class="course-top">'+pill(c[0],'purpl
 }
 function taskManager(domain){const tasks=(S.customTasks||[]).filter(t=>t.domain===domain);return card('<h3>Add an academic milestone</h3><div class="formgrid"><label class="field">Task<input id="newTask" placeholder="e.g. DMM1101 assignment 1"></label><label class="field">Date (personal / verified)<input type="date" id="newDate"></label><label class="field">Source classification<select id="newKind"><option value="Personal target">Personal target</option><option value="Officially verified by me">Officially verified by me</option></select></label><label class="field">Source URL (optional)<input id="newSource" placeholder="https://official university source"></label></div><div class="actions-row"><button class="btn primary" onclick="Degree.addTask(\''+domain+'\')">＋ Add milestone</button></div><div class="divider"></div>'+(tasks.length?tasks.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||''))).map(t=>'<div class="task"><div><div class="task-title">'+html(t.title)+'</div><div class="meta">'+html(t.date||'No date')+' · '+html(dateStatus(t.date))+' · '+html(t.kind||'Personal target')+'</div>'+ (safeURL(t.source)?L(t.source,'Source','linktext'):'')+'</div><div class="controls"><label class="checkline small"><input type="checkbox" '+(t.done?'checked':'')+' onchange="Degree.taskToggle(\''+t.id+'\',this.checked)"> Done</label><button class="btn" onclick="Degree.taskDelete(\''+t.id+'\')">Remove</button></div></div>').join(''):'<div class="empty">No milestones added yet. Enter verified LMS dates and personal targets above.</div>')+'</div>')}
 function renderComplex(){
-let head=hero('complex','https://www.complexityexplorer.org/','Explore free courses','https://networksciencebook.com/','Network Science textbook')+viewTabs([['research','Projects'],['path','Methods roadmap'],['reading','Books & ideas'],['routine','Weekly routine']]);
+let head=hero('complex','https://www.complexityexplorer.org/','Explore free courses','https://networksciencebook.com/','Network Science textbook')+viewTabs([['research','Projects'],['path','Methods'],['reading','Books'],['papers','Papers'],['routine','Routine']]);
 if(sub==='research'){
 head+=notice('Research-first design','Projects below are original proposals, not advertised university research positions. Empirical claims require evidence; ethics and consent are prerequisites for primary fieldwork.');
 head+=sec('The cross-disciplinary research lab','Anthropology × mathematics × complexity');
@@ -260,6 +277,8 @@ head+=card('<div class="timeline">'+steps.map(s=>'<div class="timeline-item"><sp
 head+=sec('Research methods shelf')+card(chip('https://networksciencebook.com/','Free Network Science textbook')+chip('https://www.complexityexplorer.org/','Complexity Explorer')+chip('https://www.santafe.edu/','Santa Fe Institute')+chip('https://www.complexityexplorer.org/courses','Open courses')+chip('https://www.openalex.org/','OpenAlex research')+chip('https://www.crossref.org/','Crossref DOI metadata')+'<p class="small muted">Institutional pages are discovery resources, not promises of open internships or supervisor availability.</p>');
 }else if(sub==='reading'){
 head+=bookShelf('Complexity · open textbook')+bookShelf('Complexity · nonfiction')+bookShelf('Complexity · fiction');
+}else if(sub==='papers'){
+head+=papersUI('Complexity');
 }else if(sub==='routine'){
 head+=notice('Adaptive by manual tracking','Log actual study sessions; completed tasks and hours stay in this browser. A repeated schedule is suggested, not an official university timetable.');
 head+=routineUI();
