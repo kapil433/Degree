@@ -195,7 +195,7 @@ head+=sec('Assignment workbench','10 first-year courses; deadlines are your veri
 head+='<div class="stack">'+MA.filter(c=>c[2]<=2).map(c=>assignmentCard(c)).join('')+'</div>';
 }else if(sub==='reading'){
 head+=notice('Legitimate book links','Free texts open their official host. Copyrighted books link to catalogue search, not unauthorized downloads.');
-head+=bookShelf('Anthropology · nonfiction')+bookShelf('Anthropology · fiction');
+head+=bookShelf('Anthropology · nonfiction')+bookShelf('Anthropology · fiction')+learningResources('Anthropology');
 }else if(sub==='papers'){
 head+=papersUI('Anthropology');
 }else if(sub==='admin'){
@@ -223,6 +223,29 @@ return sec(category,arr.length+' selected titles')+card('<div class="toolbar"><s
 function bookRow(b){
 const n=Number(b[0].slice(1)),level=bookLevel(b),catalogue='https://openlibrary.org/search?q='+encodeURIComponent(b[1]+' '+b[2]),url=b[5]||catalogue,status=S['book-'+b[0]]||'To read';
 return '<div class="bookrow"><div><div class="course-top">'+pill(String(n).padStart(2,'0'))+pill(level,level==='Beginner'?'green':level==='Intermediate'?'purple':'amber')+'</div><h4>'+html(b[1])+'</h4><p>'+html(b[2]+' · '+b[4])+'</p></div><div><select class="control small" aria-label="Reading status '+att(b[1])+'" onchange="Degree.set(&quot;book-'+b[0]+'&quot;,this.value)">'+['To read','Reading','Finished'].map(t=>'<option '+(status===t?'selected':'')+'>'+t+'</option>').join('')+'</select><div style="margin-top:6px">'+L(url,b[5]?'Open resource':'Find book','linktext')+'</div></div></div>';
+}
+function learningResources(domain){
+const data={
+Anthropology:[
+['MIT OpenCourseWare Anthropology','https://ocw.mit.edu/search/?d=Anthropology'],
+['Yale Open Courses: Anthropology','https://oyc.yale.edu/'],
+['IGNOU eGyanKosh','https://egyankosh.ac.in/'],
+['SAPIENS Anthropology Magazine','https://www.sapiens.org/'],
+['Society for Cultural Anthropology','https://culanth.org/']],
+Mathematics:[
+['MIT OpenCourseWare Mathematics','https://ocw.mit.edu/search/?d=Mathematics'],
+['3Blue1Brown · Visual mathematics','https://www.youtube.com/@3blue1brown'],
+['Professor Leonard · Calculus lectures','https://www.youtube.com/@ProfessorLeonard'],
+['The Bright Side of Mathematics','https://www.youtube.com/@brightsideofmaths'],
+['NPTEL Mathematics','https://nptel.ac.in/courses?disciplineId=111']],
+Complexity:[
+['Santa Fe Institute Complexity Explorer','https://www.complexityexplorer.org/'],
+['Complexity Explorer video lectures','https://www.youtube.com/@ComplexityExplorer'],
+['Network Science textbook','https://networksciencebook.com/'],
+['NetLogo Models Library','https://ccl.northwestern.edu/netlogo/models/'],
+['Santa Fe Institute research','https://www.santafe.edu/research']]
+};
+return sec('Lectures, videos and free learning resources')+card((data[domain]||[]).map(x=>chip(x[1],x[0])).join('')+'<p class="footnote">Video channels and course libraries are discovery links, not endorsements of every individual video. Use university material as the syllabus authority.</p>');
 }
 function papersUI(domain){
 const all=(window.DEGREE_PAPERS||[]).filter(x=>x.domain===domain).sort((a,b)=>a.year-b.year);
@@ -252,7 +275,7 @@ head+=taskManager('Mathematics');
 head+=papersUI('Mathematics');
 }else if(sub==='reading'){
 head+=notice('Math reading guide','Begin with undergraduate resources. The official MUJ PPR document also specifies course-wise textbook references in the detailed syllabus.');
-head+=bookShelf('Mathematics · open textbook')+bookShelf('Mathematics · nonfiction');
+head+=bookShelf('Mathematics · open textbook')+bookShelf('Mathematics · nonfiction')+learningResources('Mathematics');
 head+=sec('Free structured courses')+card(chip('https://ocw.mit.edu/collections/ocw-scholar/','MIT OCW Scholar')+chip('https://openstax.org/subjects/math','OpenStax mathematics')+chip('https://math.libretexts.org/','LibreTexts Mathematics')+chip('https://www.jirka.org/ra/','Basic Analysis')+chip(U.mujpdf,'MUJ official textbook references'));
 }shell(head);
 }
@@ -276,7 +299,7 @@ head+=sec('A coherent research sequence','A 12–24 month independent plan, not 
 head+=card('<div class="timeline">'+steps.map(s=>'<div class="timeline-item"><span class="stepbadge">'+s[0]+'</span><div><h4>'+s[1]+'</h4><p>'+s[2]+'</p><span class="tiny-badge">'+s[3]+'</span></div></div>').join('')+'</div>');
 head+=sec('Research methods shelf')+card(chip('https://networksciencebook.com/','Free Network Science textbook')+chip('https://www.complexityexplorer.org/','Complexity Explorer')+chip('https://www.santafe.edu/','Santa Fe Institute')+chip('https://www.complexityexplorer.org/courses','Open courses')+chip('https://www.openalex.org/','OpenAlex research')+chip('https://www.crossref.org/','Crossref DOI metadata')+'<p class="small muted">Institutional pages are discovery resources, not promises of open internships or supervisor availability.</p>');
 }else if(sub==='reading'){
-head+=bookShelf('Complexity · open textbook')+bookShelf('Complexity · nonfiction')+bookShelf('Complexity · fiction');
+head+=bookShelf('Complexity · open textbook')+bookShelf('Complexity · nonfiction')+bookShelf('Complexity · fiction')+learningResources('Complexity');
 }else if(sub==='papers'){
 head+=papersUI('Complexity');
 }else if(sub==='routine'){
