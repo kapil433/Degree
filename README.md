@@ -1,35 +1,34 @@
-# Degree Atlas
+# Degree Atlas — Learn · Explore · Experiment · Create
 
-A mobile-first academic and research companion built as a static GitHub Pages website.
+Mobile-first academic discovery and research companion in this GitHub Pages repository.
 
-## Open the application
+**Website:** https://kapil433.github.io/Degree/
 
-Site (once GitHub Pages has deployed `main` / root): https://kapil433.github.io/Degree/
+**Detailed plan and remaining work:** [BUILD_PLAN_V5.md](./BUILD_PLAN_V5.md)
 
-Source: https://github.com/kapil433/Degree
+## Academic spaces
 
-## Sections
+- **Anthropology:** IGNOU MAANY July 2026 structure, course/topic explorer, reference text and open learning resources, official assignment tracking.
+- **Mathematics:** Undergraduate bridge → MUJ MSc Mathematics → chosen Computational Science elective pathway. The bridge has no university credits.
+- **Complexity Science:** Twelve cross-disciplinary research topics and mathematical/anthropological connections.
+- **Reading paths:** 25 current books per field in an ordered complete pathway, with nine additional specialist and fiction routes. This is an expandable selection, not a permanent cap.
+- **Research discovery:** Selected primary papers plus optional OpenAlex scholarly search for up to 100 results per query. Database rankings do not constitute editorial verification.
+- **Essays, media and labs:** Topic exploration, educational publications, credible open lectures, and a browser-based threshold-diffusion simulation.
+- **Learning Lab:** Retrieval practice, spaced revision, learning-method references, study time and notes.
+- **Alexandria:** Link to the external personal library.
 
-- **Anthropology:** IGNOU July 2026 MAANY course library, official programme guide and eGyanKosh links, assignment workflow, administrative checklist, recommended fiction/nonfiction.
-- **Mathematics:** a *non-credit* undergraduate bridge, followed by the official 81-credit MUJ MSc Mathematics curriculum, proposed Computational Science electives, LMS-based personal assignment and examination tracking.
-- **Complexity:** interdisciplinary research proposals and methods roadmap connecting ethnography, mathematical modeling, network science and mobility transitions.
-- **Alexandria:** direct link to the separate reading library and local reading list status.
+## Bibliography status
 
-## Important academic source documents
+The long-term requirement is **100 verified research papers and 100 verified essays/articles for each of three fields: 600 unique works**.
 
-- IGNOU MAANY programme: https://www.ignou.ac.in/schools/programme/MAANY
-- IGNOU July 2026 prospectus: https://www.ignou.ac.in/viewFile/services/common_prospectus/common-prospectus-july-2026-V-L-1-1.pdf
-- IGNOU MAANY eGyanKosh: https://www.egyankosh.ac.in/handle/123456789/120506
-- IGNOU assignment portal: https://www.ignou.ac.in/studentService/download/assignments
-- MUJ MSc Mathematics official 2026 programme report and detailed syllabus: https://muj.onlinemanipal.com/wp-content/uploads/sites/2/2026/03/Final-PPR-for-M.Sc-Mathematics.pdf
-- MUJ programme and official FAQs: https://www.onlinemanipal.com/online-msc-mathematics-muj
+**Not completed.** Only a small starter index is individually linked; optional OpenAlex search is live discovery, not the promised static curated 300-paper collection. Public essays are presently discovered through reputable publishers, not 300 individually verified records.
 
-## Data integrity
+The detailed verification and QA plan is in [BUILD_PLAN_V5.md](./BUILD_PLAN_V5.md). Do not mistake the old mixed historical index for a completed bibliography.
 
-This is an independent companion and is **not** a university portal. Check actual course enrollment and assessment deadlines in the relevant university LMS, assignments and official notices. In particular, IGNOU assignment PDFs for January 2026 should not be assumed valid for a July 2026 admission. University credits and assessments are separate from self-directed preparation milestones and study progress.
+## Tech and data
 
-All progress is saved in the current browser's `localStorage`. Use **Backup** to export JSON before clearing storage or changing devices. There is no cloud sync or automatic university deadline feed.
+The homepage loads the modular v5 catalogue, app and style files. It requires no build pipeline. Browser progress is stored locally; Backup and Restore export/import JSON. Existing locally stored progress from the prior version is migrated where applicable. No cloud sync, AI backend or automatic university deadline retrieval is implemented.
 
-## Technical
+Deploy via GitHub Pages from the main branch and repository root.
 
-`index.html` + `styles.css` + `app.js`. No frontend build step or paid dependency. GitHub Pages should be configured to deploy from the `main` branch at `/ (root)`.
+This is an independent learning companion, **not an official university portal**. Confirm enrolment, deadlines, elective registration and assessment details through IGNOU and MUJ.
