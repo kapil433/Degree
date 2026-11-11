@@ -1,52 +1,37 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#17243d">
-  <meta name="description" content="Degree Atlas: an independent learning companion for IGNOU MA Anthropology, Manipal University Jaipur MSc Mathematics, complexity science, and Alexandria Library.">
-  <title>Degree Atlas 3.0 · Academic & Research Companion</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%235b51cf'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Arial' font-size='43' font-weight='bold' fill='white'%3ED%3C/text%3E%3C/svg%3E">
-  <link rel="stylesheet" href="./styles.css?v=6">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123634">
+<meta name="description" content="Degree Atlas: explore IGNOU Anthropology, MUJ Mathematics, Complexity Science, books, research, and experiments.">
+<title>Degree Atlas · Learn · Explore · Experiment · Create</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23132e2f'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Arial' font-size='42' font-weight='bold' fill='white'%3ED%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="./atlas-style-v5.css?v=20261112b">
 </head>
 <body>
-  <div class="layout">
-    <aside class="sidebar" aria-label="Primary navigation">
-      <div class="brand">
-        <div class="brandmark" aria-hidden="true">D</div>
-        <div><div class="brand-name">Degree Atlas</div><div class="brand-sub">Learn · Connect · Create</div></div>
+<div id="layout">
+  <aside id="side" aria-label="Primary navigation">
+    <div class="identity"><div class="logo">D<span>.</span></div><div><strong>Degree Atlas</strong><small>Learn · Explore · Create</small></div></div>
+  </aside>
+  <div id="maincol">
+    <header id="topbar">
+      <div class="crumb">Degree Atlas <span aria-hidden="true"> / </span> Academic discovery</div>
+      <div class="mobilelogo"><span class="minilogo">D</span> Degree Atlas</div>
+      <div class="top-actions">
+        <button type="button" aria-label="Toggle dark mode" onclick="Atlas.dark()" title="Toggle theme">◐</button>
+        <button type="button" onclick="Atlas.backup()" title="Download your progress">⇩ Backup</button>
+        <label title="Restore progress from JSON backup">⇧ Restore<input type="file" accept=".json,application/json" onchange="Atlas.importFile(this)"></label>
       </div>
-      <div class="side-label">My degrees & research</div>
-      <nav class="nav" id="side-nav">
-        <a href="#anth">Anthropology</a><a href="#math">Mathematics</a><a href="#complex">Complexity</a><a href="#library">Alexandria</a>
-      </nav>
-      <div class="side-bottom">
-        <div class="small muted" style="font-weight:760">Evidence before assumptions.</div>
-        <p class="caption">Official courses and independently designed learning bridges are labelled separately. Deadlines require university verification.</p>
-        <a href="https://github.com/kapil433/Degree" target="_blank" rel="noopener noreferrer">View source & updates ↗</a>
-      </div>
-    </aside>
-    <div class="maincol">
-      <header class="topbar">
-        <div class="mobile-brand">◈ Degree Atlas</div>
-        <div class="topmeta">WORKSPACE <span style="opacity:.4;padding:0 10px">/</span> <span id="current-section">Anthropology</span></div>
-        <div class="topactions">
-          <button type="button" id="nightbtn" class="iconbtn" aria-label="Toggle light and dark theme" title="Theme">☾</button>
-          <button type="button" id="backupbtn" class="btn" title="Download or restore your progress">⇩ <span>Backup</span></button>
-        </div>
-      </header>
-      <main class="content" id="view" tabindex="-1" aria-live="polite">
-        <div class="hero"><div class="eyebrow">DEGREE ATLAS</div><h1>Learning, in one place.</h1><p>Four connected spaces for anthropology, mathematics, interdisciplinary science, and your library.</p></div>
-      </main>
-    </div>
+    </header>
+    <main id="app">
+      <div class="welcome"><div class="eyebrow">DEGREE ATLAS</div><h1>Make knowledge <em>connect.</em></h1><p>Building your academic atlas.</p></div>
+    </main>
   </div>
-  <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
-    <a href="#anth">Anthropology</a><a href="#math">Mathematics</a><a href="#complex">Complexity</a><a href="#library">Alexandria</a>
-  </nav>
-  <div class="modal hide" id="modal" role="dialog" aria-modal="true" aria-label="Backup and preferences"></div>
-  <noscript><div style="position:fixed;inset:10%;background:white;color:black;padding:25px;z-index:99;border-radius:16px"><h2>JavaScript required</h2><p>Enable JavaScript to use the interactive Degree Atlas. The source documents are still available at IGNOU and MUJ official websites.</p></div></noscript>
-  <script src="./course-resources.js?v=1" defer></script>
-  <script src="./verified-readings.js?v=1" defer></script>
-  <script src="./app.js?v=8" defer></script>
+</div>
+<nav id="bottom" aria-label="Mobile navigation"></nav>
+<noscript><main><h2>JavaScript required</h2><p>Enable JavaScript to use the independent academic companion. You can read the official curricula through IGNOU and Manipal University Jaipur.</p></main></noscript>
+<script defer src="./atlas-catalog-v5.js?v=20261112b"></script>
+<script defer src="./atlas-app-v5.js?v=20261112b"></script>
 </body>
 </html>
