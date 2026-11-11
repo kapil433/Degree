@@ -205,6 +205,13 @@ head+=sec('Official academic support')+card(chip(U.ignou,'Programme information'
 }shell(head);
 }
 function checkTask(t){return '<label class="checkline" style="padding:8px 0;font-size:.85rem"><input type="checkbox" '+(S['task-'+t[0]]?'checked':'')+' onchange="Degree.set(\'task-'+t[0]+'\',this.checked)"><span>'+html(t[1])+'</span></label>'}
+
+function courseResource(code){
+const all=window.DEGREE_COURSE_RESOURCES||{},d=all.anth?.[code]||all.math?.[code]||all.found?.[code];
+if(!d)return '';
+return '<div class="course-detail"><div class="small muted">PRIMARY REFERENCE</div><b>'+html(d[0])+'</b><div class="small muted">'+html(d[1])+'</div><p>'+html(d[4])+'</p><div class="source-links">'+L('https://openlibrary.org/search?q='+encodeURIComponent(d[0]+' '+d[1]),'Find textbook')+L(d[2],'Open course / learning resource')+'</div></div>';
+}
+
 function renderAnthCourse(c){
 const id=c[0];return card('<div class="course"><div><div class="course-top">'+pill('Semester '+c[2],'purple')+pill(c[4])+pill(c[3]+' credits')+'</div><div class="course-name">'+html(id+' · '+c[1])+'</div><p class="course-desc">'+html(c[6])+'</p></div><label title="Personal completion only"><input aria-label="Mark course completed" class="course-check" type="checkbox" '+(S['done-'+id]?'checked':'')+' onchange="Degree.set(&quot;done-'+id+'&quot;,this.checked)"></label></div>');
 }
@@ -251,6 +258,7 @@ function papersUI(domain){
 const all=(window.DEGREE_PAPERS||[]).filter(x=>x.domain===domain).sort((a,b)=>a.year-b.year);
 return notice('Chronological intellectual history','This is a curated mix of papers, landmark books, chapters and some thematic reading leads, not 100 peer-reviewed articles. Search links are for finding and verifying the correct editions. Bibliographic details need individual checking before formal citation.')+sec('Landmark readings',all.length+' entries · oldest to newest')+card('<div class="book-list">'+all.map((p,i)=>'<div class="bookrow"><div><div class="course-top">'+pill(p.year,'purple')+pill(p.kind)+'</div><h4>'+html(p.title)+'</h4><p>'+html(p.authors)+'</p></div><div><select class="control small" onchange="Degree.set(&quot;paper-'+p.id+'&quot;,this.value)">'+['To read','Reading','Finished'].map(v=>'<option '+(S['paper-'+p.id]===v?'selected':'')+'>'+v+'</option>').join('')+'</select><div style="margin-top:5px">'+L('https://scholar.google.com/scholar?q='+encodeURIComponent(p.title+' '+p.authors),'Find source','linktext')+'</div></div></div>').join('')+'</div>');
 }
+function foundationResource(code){return courseResource(code)}
 function renderMath(){
 let head=hero('math',U.mujpdf,'Official detailed syllabus',U.muj,'MUJ programme')+viewTabs([['foundations','Foundations'],['msc','MUJ MSc'],['planner','Planner'],['reading','Books'],['papers','Papers']]);
 if(sub==='foundations'){
